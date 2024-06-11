@@ -27,6 +27,9 @@ public class MouseController : MonoBehaviour
             Ray ray = m_Camera.ScreenPointToRay(mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
+                GameObject hitObject = hit.collider.gameObject;
+                hitObject.GetComponent<ClickScript>().MouseClick();
+                
                 // Use the hit variable to determine what was clicked on.
                 Debug.Log ("CLICKED ");
             }

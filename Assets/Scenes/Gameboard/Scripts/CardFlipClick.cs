@@ -8,7 +8,7 @@ using UnityEngine.UIElements;
 public class CardFlipClick : MonoBehaviour
 {
     Camera m_Camera;
-    Animator animator;
+    private Animator anim;
     
     void Awake()
     {
@@ -19,27 +19,27 @@ public class CardFlipClick : MonoBehaviour
     void Start()
     {
         
-        animator = GetComponent<Animator>();
+        anim = this.gameObject.GetComponent<Animator>();
         Debug.Log ("CLICKED ");
-        this.gameObject.GetComponent<Animator>().enabled = false;
+        //this.gameObject.GetComponent<Animator>().enabled = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        /*
         Mouse mouse = Mouse.current;
         if (mouse.leftButton.wasPressedThisFrame)
         {
             Vector3 mousePosition = mouse.position.ReadValue();
             Ray ray = m_Camera.ScreenPointToRay(mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit))
-            {
-                
+            { 
                 if (hit.collider == this.gameObject.GetComponent<Collider>())
                 {
-                    GetComponent<Animator>().enabled = false;
-                    this.gameObject.GetComponent<Animator>().enabled = true;
+                    anim.SetTrigger("Klick");
+                    //GetComponent<Animator>().enabled = false;
+                    //this.gameObject.GetComponent<Animator>().enabled = true;
               
                     Debug.Log ("CLICKED " + this.gameObject.name);
                 }
@@ -48,14 +48,16 @@ public class CardFlipClick : MonoBehaviour
                 //rest of the programm to end the Animation
                 //this.gameObject.transform.Rotate(180,0,0);
                 
-                //animator.SetBool("Klick",true);
-                animator.SetTrigger("Klick0");
+                //animator.SetBool("Klick",true);  
             }
             
-        }
+        }*/
         
         
-        
-        
+    }
+
+     void OnMouseDown()
+    {
+        anim.SetTrigger("Klick");
     }
 }
