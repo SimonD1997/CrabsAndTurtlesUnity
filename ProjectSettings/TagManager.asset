@@ -7,17 +7,16 @@ TagManager:
   - MainLight
   - CinemachineTarget
   - ScreenCamera
-  - cockpit_capitalLaser
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Temp_Post
+  - Cards1
   - Water
   - UI
-  - Terminal
-  - Location
-  - LookInteractor
+  - Cards2
+  - 
+  - 
   - Screen
   - Occluder
   - Camera
@@ -29,13 +28,13 @@ TagManager:
   - 
   - 
   - 
-  - Cockpit
-  - Cockpit_3DSkybox
-  - Cockpit_3DSkybox_BG
-  - Cockpit_Ally
-  - Cockpit_Invader
-  - Cockpit_BG
-  - Cockpit_DepthClear
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
   - 
   - 
   - 
@@ -44,4 +43,10 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: UI
+    uniqueID: 2107795131
+    locked: 0
+  - name: Cards
+    uniqueID: 450035283
     locked: 0
