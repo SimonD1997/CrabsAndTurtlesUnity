@@ -24,14 +24,8 @@ public class ClickScript : MonoBehaviour
             Vector3 mousePosition = mouse.position.ReadValue();
             Ray ray = m_Camera.ScreenPointToRay(mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit))
-            { 
-                if (hit.collider == this.gameObject.GetComponent<Collider>())
-                {
-                    
-                    
-              
-                    Debug.Log ("CLICKED " + this.gameObject.name);
-                }
+            {
+                Debug.Log(hit.collider.name);
                 
                  
             }
