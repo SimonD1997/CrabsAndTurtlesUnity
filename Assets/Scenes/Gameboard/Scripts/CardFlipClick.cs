@@ -8,6 +8,7 @@ public class CardFlipClick : MonoBehaviour
     Camera m_Camera;
     private Animator _anim;
     private Collider _collider;
+    private bool _down = true;
     
     void Awake()
     {
@@ -40,9 +41,24 @@ public class CardFlipClick : MonoBehaviour
                 {
                     return;
                 }
+                
+                
                 if (hit.collider == _collider)
                 {
-                    _anim.SetTrigger("Klick");
+                    //Karte bleibt umgedreht und soll dann nach dem nächsten Würfelwurf vom stapel genommen werden
+                    if (_down == true)
+                    {
+                        _anim.SetTrigger("Klick");
+                        _down = false;
+                    }
+                    
+                    /*
+                    else
+                    {
+                    // TODO: zoom auf die Karte!!
+                        _down = true;
+                    }*/
+                    
                     //GetComponent<Animator>().enabled = false;
                     //this.gameObject.GetComponent<Animator>().enabled = true;
 
@@ -66,4 +82,14 @@ public class CardFlipClick : MonoBehaviour
     {
         anim.SetTrigger("Klick");
     }*/
+    public void SetTurnState(bool turnState)
+    {
+        _down = turnState;
+    }
+
+    public void ClickStateActivate()
+    {
+        _anim.SetTrigger("Klick");
+    }
+
 }
