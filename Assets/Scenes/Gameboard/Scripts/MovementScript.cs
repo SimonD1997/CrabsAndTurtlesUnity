@@ -10,7 +10,7 @@ public class MovementScript : MonoBehaviour
     public TMP_InputField input;
     private SplineUser _splineUser;
     private Dreamteck.Splines.SplineFollower _splineFollower;
-    private double aktuellePosition;
+    private int aktuellePosition;
     
     
     // Array für distanzen der einzelnen Felder
@@ -64,7 +64,7 @@ public class MovementScript : MonoBehaviour
         _splineUser = GetComponent<SplineUser>();
         _splineFollower = GetComponent<Dreamteck.Splines.SplineFollower>();
         //setzt die Anfangs und Endanimationspunkte fest.
-        _splineUser.SetClipRange(_felder[2], _felder[10]);
+        _splineUser.SetClipRange(_felder[0], _felder[0]);
         
         //setzt die Richtungsparameter bzw. lässt den start manuell auswählen
         //_splineFollower.autoStartPosition = false;
@@ -93,18 +93,27 @@ public class MovementScript : MonoBehaviour
 /// Lässt das Objekt an einem gegeben Spline entlanglaufen.
 /// </summary>
 /// <param name="steps"> legt fest wie viele Blöcke nach vorne oder zurückgelaufen werden messen</param>
-    void Movement(float steps)
+    public void Movement(int steps)
     {
-        
+        // falls über oder unter die Arraygrenze kommt, schauen wie in den Regeln behandelt werden soll;
+        // ob man direkt treffen muss oder solange weitergeht wie es halt geht
 
         if (steps > 0)
         {
             
-            _splineFollower.direction = Spline.Direction.Forward;
-            
+            _splineUser.SetClipRange(_felder[aktuellePosition], _felder[aktuellePosition + steps]);
+            _splineFollower.Restart();
+            _splineFollower.Rebuild();
+            aktuellePosition = aktuellePosition + steps;
+
         }else if (steps < 0)
         {
+            _splineUser.SetClipRange(_felder[aktuellePosition], _felder[aktuellePosition + steps]);
+            _splineFollower.Restart();
+            _splineFollower.Rebuild();
             _splineFollower.direction = Spline.Direction.Backward;
+            aktuellePosition = aktuellePosition + steps;
+
         }
     }
 }
