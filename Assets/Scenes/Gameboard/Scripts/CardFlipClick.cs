@@ -82,9 +82,9 @@ public class CardFlipClick : MonoBehaviour
     {
         anim.SetTrigger("Klick");
     }*/
-    public void SetTurnState(bool turnState)
+    public bool GetTurnState()
     {
-        _down = turnState;
+        return _down;
     }
 
     public void ClickStateActivate()
