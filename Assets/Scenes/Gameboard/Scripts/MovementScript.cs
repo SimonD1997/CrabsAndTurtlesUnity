@@ -11,6 +11,9 @@ public class MovementScript : MonoBehaviour
     private SplineUser _splineUser;
     private Dreamteck.Splines.SplineFollower _splineFollower;
     private int aktuellePosition;
+    private byte _positionCard; /// <summary>
+                                /// gerade positionen sind rästelkarten und ungerade sind ereigniskarten
+                                /// </summary>
     
     
     // Array für distanzen der einzelnen Felder
@@ -56,6 +59,8 @@ public class MovementScript : MonoBehaviour
         0.9375497,
         0.9642977
     };
+
+    
     
     
     // Start is called before the first frame update
@@ -115,5 +120,20 @@ public class MovementScript : MonoBehaviour
             aktuellePosition = aktuellePosition + steps;
 
         }
+        
+        
+    }
+
+    public int GetPositionCard()
+    {
+        if (aktuellePosition%2 == 0)
+        {
+            return _positionCard = 0;
+        }
+        else
+        {
+            return _positionCard = 1;
+        }
+        
     }
 }

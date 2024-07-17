@@ -55,21 +55,21 @@ namespace Scenes.Gameboard.Scripts
         
         public void Rot()
         {
-            _rotVarList.Add(Convert.ToInt32(rotGameObject.GetComponentInChildren<TextMeshPro>().text));
+            _aktuelleVarRot = Convert.ToInt32(rotGameObject.GetComponentInChildren<TMP_InputField>().text);
             addToList();
             rotGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarRot.ToString();
         }
         
         public void Blau()
         {
-            _blauVarList.Add(Convert.ToInt32(blauGameObject.GetComponentInChildren<TextMeshPro>().text));
+            _aktuelleVarBlau = Convert.ToInt32(blauGameObject.GetComponentInChildren<TMP_InputField>().text);
             addToList();
             blauGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarBlau.ToString();
         }
         
         public void Gelb()
         {
-            _gelbVarList.Add(Convert.ToInt32(gelbGameObject.GetComponentInChildren<TMP_InputField>().text));
+            _aktuelleVarGelb = Convert.ToInt32(gelbGameObject.GetComponentInChildren<TMP_InputField>().text);
             addToList();
             gelbGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarGelb.ToString();
         }
@@ -94,7 +94,7 @@ namespace Scenes.Gameboard.Scripts
             {
                 logTemp.text.Insert(logTemp.text.Length, _aktuelleVarGruen.ToString());
                 stringtemp = stringtemp +  _gruenVarList[i].ToString() + "\t" +_rotVarList[i].ToString() +
-                "\t" + _rotVarList[i].ToString() + "\t" + _gelbVarList[i].ToString() + System.Environment.NewLine;
+                "\t" + _blauVarList[i].ToString() + "\t" + _gelbVarList[i].ToString() + System.Environment.NewLine;
                 
             }
             

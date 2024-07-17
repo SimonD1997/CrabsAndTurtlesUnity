@@ -48,6 +48,7 @@ public class CardFlipClick : MonoBehaviour
                     //Karte bleibt umgedreht und soll dann nach dem nächsten Würfelwurf vom stapel genommen werden
                     if (_down == true)
                     {
+                        _anim.enabled = true;
                         _anim.SetTrigger("Klick");
                         _down = false;
                     }
