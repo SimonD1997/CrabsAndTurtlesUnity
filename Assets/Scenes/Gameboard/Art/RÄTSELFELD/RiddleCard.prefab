@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6451849221407713924}
   - component: {fileID: 8921146467223758213}
   - component: {fileID: 8109504457860531637}
+  - component: {fileID: -2129814264944563268}
   - component: {fileID: 7348831395977296389}
   m_Layer: 0
   m_Name: RiddleCard
@@ -69,6 +70,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a72d245552d6719408c9ddb9bac6ed96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-2129814264944563268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 747658553907032153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0fbdcd330695de746b4d58dd976e8142, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _card: {fileID: 3045967681711246839}
 --- !u!95 &7348831395977296389
 Animator:
   serializedVersion: 5
@@ -255,6 +269,6 @@ SpriteRenderer:
   m_Size: {x: 12.02, y: 12.02}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0

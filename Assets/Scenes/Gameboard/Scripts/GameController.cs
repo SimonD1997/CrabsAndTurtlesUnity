@@ -10,7 +10,9 @@ namespace Scenes.Gameboard.Scripts
 {
     public class GameController : MonoBehaviour
     {
-    
+        private int _diceNumber;
+        
+        
         //Todo:
         //Rundenbasierte Spielmechanik einführen 
 
@@ -18,11 +20,13 @@ namespace Scenes.Gameboard.Scripts
         private int playerTurn = 0;
         public TextMeshProUGUI yourTurnField ;
         public MovementScript movementScript;
-        private int _diceNumber;
+        
         public GameObject cardPrefab;
         public GameObject riddleCardPrefab;
         public Sprite[] cardPrefabStack;
         public Sprite[] riddlePrefabStack;
+        
+        
         
         //private GameObject[] _cardStack;
         private List<GameObject> _cardList;
