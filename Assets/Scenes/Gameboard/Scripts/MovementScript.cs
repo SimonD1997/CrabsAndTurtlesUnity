@@ -11,9 +11,13 @@ public class MovementScript : MonoBehaviour
     private SplineUser _splineUser;
     private Dreamteck.Splines.SplineFollower _splineFollower;
     private int aktuellePosition;
-    private byte _positionCard; /// <summary>
-                                /// gerade positionen sind rästelkarten und ungerade sind ereigniskarten
-                                /// </summary>
+    
+    /// <summary>
+    /// gerade positionen sind rästelkarten und ungerade sind ereigniskarten
+    /// </summary>
+    private byte _positionCard;
+    
+    private int _positionColour; 
     
     
     // Array für distanzen der einzelnen Felder
@@ -59,8 +63,56 @@ public class MovementScript : MonoBehaviour
         0.9375497,
         0.9642977
     };
-
-    
+/// <summary>
+/// red = 1
+/// blue = 2
+/// gruen = 3
+/// gelb = 4
+/// </summary>
+    int[] _felderColour = new int[]
+    {
+        0,
+        1,
+        2,
+        3,
+        1,
+        4,
+        3,
+        2,
+        4,
+        1,
+        2,
+        3,
+        1,
+        4,
+        3,
+        2,
+        4,
+        1,
+        2,
+        3,
+        1,
+        4,
+        3,
+        2,
+        4,
+        1,
+        2,
+        3,
+        1,
+        4,
+        3,
+        2,
+        4,
+        1,
+        2,
+        3,
+        1,
+        4,
+        3,
+        2,
+        4,
+    };
     
     
     // Start is called before the first frame update
@@ -110,6 +162,7 @@ public class MovementScript : MonoBehaviour
             _splineFollower.Restart();
             _splineFollower.Rebuild();
             aktuellePosition = aktuellePosition + steps;
+            _positionColour = _felderColour[aktuellePosition];
 
         }else if (steps < 0)
         {
@@ -135,5 +188,15 @@ public class MovementScript : MonoBehaviour
             return _positionCard = 1;
         }
         
+    }
+
+    public int GetPosition()
+    {
+        return aktuellePosition;
+    }
+    
+    public int GetPositionColour()
+    {
+        return _positionColour;
     }
 }

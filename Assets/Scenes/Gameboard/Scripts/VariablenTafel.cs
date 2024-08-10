@@ -98,13 +98,32 @@ namespace Scenes.Gameboard.Scripts
                 
             }
             
-            
             logTemp.text = stringtemp;
-            
-            
 
         }
+
         
-        
+        public int GetVar(int colour)
+        {
+            int colourVar = 0;
+            switch (colour)
+            {
+                case 1: //red
+                    colourVar = _aktuelleVarRot;
+                    break;
+                case 2: //blue
+                    colourVar = _aktuelleVarBlau;
+                    break;
+                case 3: //gruen
+                    colourVar = _aktuelleVarGruen;
+                    break;
+                case 4: //gelb
+                    colourVar = _aktuelleVarGelb;
+                    break;
+            }
+
+            return colourVar;
+        }
+
     }
 }

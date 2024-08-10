@@ -80,6 +80,12 @@ namespace Scenes.Gameboard.Scripts
         
         }
 
+        public int GetDiceNumber()
+        {
+            return this._diceNumber;
+        }
+        
+        
         public void SetDiceNumber(int diceNumber)
         {
             this._diceNumber = diceNumber;
@@ -165,6 +171,11 @@ namespace Scenes.Gameboard.Scripts
             tempCard.GetComponentInChildren<SpriteRenderer>().sprite = spriteStack[Random.Range(0,spriteStack.Length)];
             cardList.Add(tempCard);
            
+        }
+
+        public void StartRiddle(int correctAnswer)
+        {
+            
         }
 
     }

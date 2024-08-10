@@ -6,8 +6,9 @@ using UnityEngine;
 
 public class RiddleScript : MonoBehaviour
 {
-    private MonoBehaviour _gameController;
+    private GameController _gameController;
     private SpriteRenderer _spriteRenderer;
+    private VariablenTafel _variablenTafel;
     private string _cardName;
     private byte _elementeAnzahl;
     private List<byte> _elemente;
@@ -18,6 +19,7 @@ public class RiddleScript : MonoBehaviour
     private void Start()
     {
         _gameController = FindObjectOfType<GameController>();
+        _variablenTafel = FindObjectOfType<VariablenTafel>();
         
         _spriteRenderer = this.gameObject.GetComponentInChildren<SpriteRenderer>();
         _cardName = _spriteRenderer.sprite.name;
@@ -52,10 +54,50 @@ public class RiddleScript : MonoBehaviour
                 
                 break;
             case 3:
+                int index2 = 1;
                 
+                _elemente.Add(Convert.ToByte(_cardName[1]));
+                _elementeRightAnswer.Add(ElementWert(Convert.ToByte(_cardName[1])));
+                index2 = index2 + ElementPlusIndex(Convert.ToByte(_cardName[1]));
+                
+                if (_cardName[index2].ToString() == "+")
+                {
+                    _elemente.Add(Convert.ToByte(_cardName[index2+1]));
+                    _elementeRightAnswer.Add(ElementWert(Convert.ToByte(_cardName[index2+1])));
+                    _answer = _elementeRightAnswer[0] + _elementeRightAnswer[1];
+                }else if (_cardName[index2].ToString() == "-")
+                {
+                    _elemente.Add(Convert.ToByte(_cardName[index2+1]));
+                    _elementeRightAnswer.Add(ElementWert(Convert.ToByte(_cardName[index2+1])));
+                    _answer = _elementeRightAnswer[0] - _elementeRightAnswer[1];
+                }else if (_cardName[index2].ToString() == ".")
+                {
+                    _elemente.Add(Convert.ToByte(_cardName[index2+1]));
+                    _elementeRightAnswer.Add(ElementWert(Convert.ToByte(_cardName[index2+1])));
+                    _answer = _elementeRightAnswer[0] * _elementeRightAnswer[1];
+                }
+                index2 = index2 + ElementPlusIndex(Convert.ToByte(_cardName[index2]));
+                
+                if (_cardName[index2].ToString() == "+")
+                {
+                    _elemente.Add(Convert.ToByte(_cardName[index2+1]));
+                    _elementeRightAnswer.Add(ElementWert(Convert.ToByte(_cardName[index2+1])));
+                    _answer = _answer + _elementeRightAnswer[2];
+                }else if (_cardName[index2].ToString() == "-")
+                {
+                    _elemente.Add(Convert.ToByte(_cardName[index2+1]));
+                    _elementeRightAnswer.Add(ElementWert(Convert.ToByte(_cardName[index2+1])));
+                    _answer = _answer - _elementeRightAnswer[2];
+                }else if (_cardName[index2].ToString() == ".")
+                {
+                    _elemente.Add(Convert.ToByte(_cardName[index2+1]));
+                    _elementeRightAnswer.Add(ElementWert(Convert.ToByte(_cardName[index2+1])));
+                    _answer = _answer * _elementeRightAnswer[2];
+                }
                 
                 break;
             default:
+                _answer = -999;
                 break;
         }
     }
@@ -90,16 +132,16 @@ public class RiddleScript : MonoBehaviour
         switch (elementCode)
         {
             case 1:
-                
+                elementWert = _gameController.movementScript.GetPosition();
                 break;
             case 2:
-                
+                elementWert = _variablenTafel.GetVar(_gameController.movementScript.GetPositionColour());
                 break;
             case 3:
-                
+                elementWert = _gameController.GetDiceNumber();
                 break;
             case 4:
-                
+                elementWert = Convert.ToInt32(_cardName[elementCode - (elementCode+4)]);
                 break;
             default:
                 break;
@@ -107,5 +149,9 @@ public class RiddleScript : MonoBehaviour
 
         return elementWert;
     }
-    
+
+    public void StartRiddle()
+    {
+        _gameController.StartRiddle(_answer);
+    }
 }

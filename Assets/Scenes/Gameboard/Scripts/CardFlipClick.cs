@@ -91,6 +91,13 @@ public class CardFlipClick : MonoBehaviour
     public void ClickStateActivate()
     {
         _anim.SetTrigger("Klick");
+
+        if (this.gameObject.GetComponent<RiddleScript>() != null)
+        {
+            this.gameObject.GetComponent<RiddleScript>().StartRiddle();
+        }
+
+        
     }
 
 }
