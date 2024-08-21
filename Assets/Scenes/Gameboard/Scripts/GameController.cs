@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Security.Policy;
 using System.Xml.Linq;
@@ -15,7 +16,7 @@ namespace Scenes.Gameboard.Scripts
         
         //Todo:
         //Rundenbasierte Spielmechanik einführen 
-
+        
         private bool gameIsRunning = false;
         private int playerTurn = 0;
         public TextMeshProUGUI yourTurnField ;
@@ -25,8 +26,11 @@ namespace Scenes.Gameboard.Scripts
         public GameObject riddleCardPrefab;
         public Sprite[] cardPrefabStack;
         public Sprite[] riddlePrefabStack;
-        
-        
+
+        private Timer _timer;
+        public bool inputFieldEnter = false;
+        public TextMeshProUGUI inputField;
+        public TextMeshProUGUI timerField;
         
         //private GameObject[] _cardStack;
         private List<GameObject> _cardList;
@@ -175,8 +179,34 @@ namespace Scenes.Gameboard.Scripts
 
         public void StartRiddle(int correctAnswer)
         {
+            _timer = ScriptableObject.CreateInstance<Timer>();
+            _timer.timeRemaining = 30;
+            _timer.text = this.timerField;
+            
+            
+            StartCoroutine(waiter());
+            
+            if (inputField.text == correctAnswer.ToString())
+            {
+                Debug.Log("correct Answer");
+            }
+            else
+            {
+                Debug.Log("wrong Answer");
+            }
             
         }
 
+        IEnumerator waiter()
+        {
+            while (_timer.timerIsRunning == true)
+            {
+                if (inputFieldEnter)
+                {
+                    //Quit function
+                    yield break;
+                }
+            }
+        }
     }
 }
