@@ -51,6 +51,15 @@ public class CardFlipClick : MonoBehaviour
                         _anim.enabled = true;
                         _anim.SetTrigger("Klick");
                         _down = false;
+                        
+                        
+                        Debug.Log(this.gameObject.GetComponent<RiddleScript>() != null);
+                        
+                        if (this.gameObject.GetComponent<RiddleScript>() != null)
+                        {
+                            Debug.Log("RiddleScript Vorhanden");
+                            this.gameObject.GetComponent<RiddleScript>().StartRiddle();
+                        }
                     }
                     
                     /*
@@ -91,12 +100,6 @@ public class CardFlipClick : MonoBehaviour
     public void ClickStateActivate()
     {
         _anim.SetTrigger("Klick");
-
-        if (this.gameObject.GetComponent<RiddleScript>() != null)
-        {
-            this.gameObject.GetComponent<RiddleScript>().StartRiddle();
-        }
-
         
     }
 

@@ -3,18 +3,13 @@ using TMPro;
 
 namespace Scenes.Gameboard.Scripts
 {
-    public class Timer : ScriptableObject
+    public class Timer : MonoBehaviour
     {
         public TextMeshProUGUI text;
         public float timeRemaining = 30;
+        private string _timeText;
         public bool timerIsRunning = false;
-        // Start is called before the first frame update
-        void Start()
-        {
-            
-            timerIsRunning = true;
-        }
-
+        
         // Update is called once per frame
         void Update()
         {
@@ -29,8 +24,24 @@ namespace Scenes.Gameboard.Scripts
                 {
                     timeRemaining = 0;
                     timerIsRunning = false;
-                }
+                } 
+                //Debug.Log("Timer:" + timeRemaining);
+                
             }
+            this.text.text = timeRemaining.ToString();
+            
+           
+        }
+
+       public void StartTimer()
+        {
+            timerIsRunning = true;
+        }
+
+        public void StopTimer()
+        {
+            timerIsRunning = false;
+            timeRemaining = 0;
         }
     }
 }

@@ -21,6 +21,7 @@ namespace Scenes.Gameboard.Scripts
         private int playerTurn = 0;
         public TextMeshProUGUI yourTurnField ;
         public MovementScript movementScript;
+        public VariablenTafel variablenTafel;
         
         public GameObject cardPrefab;
         public GameObject riddleCardPrefab;
@@ -28,8 +29,9 @@ namespace Scenes.Gameboard.Scripts
         public Sprite[] riddlePrefabStack;
 
         private Timer _timer;
+        private int _correctAnswer;
         public bool inputFieldEnter = false;
-        public TextMeshProUGUI inputField;
+        public TMP_InputField inputField;
         public TextMeshProUGUI timerField;
         
         //private GameObject[] _cardStack;
@@ -84,11 +86,15 @@ namespace Scenes.Gameboard.Scripts
         
         }
 
+        public void EndEditInputField()
+        {
+            inputFieldEnter = true;
+        }
         public int GetDiceNumber()
         {
+            Debug.Log("DiceNumber:"+ this._diceNumber);
             return this._diceNumber;
         }
-        
         
         public void SetDiceNumber(int diceNumber)
         {
@@ -177,36 +183,54 @@ namespace Scenes.Gameboard.Scripts
            
         }
 
-        public void StartRiddle(int correctAnswer)
+        public void StartRiddle(int correctAnswer, Timer timer)
         {
-            _timer = ScriptableObject.CreateInstance<Timer>();
+            inputField.text = "";
+            inputFieldEnter = false;
+            _timer =  timer;
+            _correctAnswer = correctAnswer;
             _timer.timeRemaining = 30;
-            _timer.text = this.timerField;
+            //_timer.text = this.timerField;
+            _timer.StartTimer();
             
             
-            StartCoroutine(waiter());
+            StartCoroutine(Waiter());
             
-            if (inputField.text == correctAnswer.ToString())
+        }
+
+        void prüftAnswer()
+        {
+            if (inputField.text.Equals(_correctAnswer.ToString()))
             {
                 Debug.Log("correct Answer");
+                inputField.text = "Richtige Antwort";
+
             }
             else
             {
                 Debug.Log("wrong Answer");
+                inputField.text = "Falsche Antwort";
+                
             }
-            
         }
-
-        IEnumerator waiter()
+        IEnumerator Waiter()
         {
-            while (_timer.timerIsRunning == true)
+            
+            Debug.Log("correct Answer:" + _correctAnswer);
+            
+            while (_timer.timerIsRunning && _timer.timeRemaining != 0)
             {
                 if (inputFieldEnter)
                 {
-                    //Quit function
+                    _timer.StopTimer();
+                    prüftAnswer();
                     yield break;
-                }
+                } 
+                yield return null;
             }
+            
+            prüftAnswer();
+            
         }
     }
 }
