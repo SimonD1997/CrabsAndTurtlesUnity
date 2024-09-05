@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -105,8 +106,11 @@ public class CardFlipClick : MonoBehaviour
 
     public void ClickStateActivate()
     {
+        
         _anim.SetTrigger("Klick");
         
     }
+
+    
 
 }

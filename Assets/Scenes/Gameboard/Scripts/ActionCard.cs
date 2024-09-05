@@ -70,6 +70,8 @@ public class ActionCard : MonoBehaviour
                     _gameController.SetNextMove(turtle);
                     //turtle
                 }
+
+                _colourVariablesNew = -999;
                  
                 break;
             case 3:

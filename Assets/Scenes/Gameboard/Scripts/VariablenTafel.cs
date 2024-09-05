@@ -9,10 +9,10 @@ namespace Scenes.Gameboard.Scripts
     
     public class VariablenTafel : MonoBehaviour
     {
-        int _aktuelleVarGruen;
-        int _aktuelleVarRot;
-        int _aktuelleVarBlau;
-        int _aktuelleVarGelb;
+        int _aktuelleVarGruen = 1;
+        int _aktuelleVarRot = 1;
+        int _aktuelleVarBlau = 1;
+        int _aktuelleVarGelb = 1;
         private List<int> _gruenVarList;
         private List<int> _rotVarList;
         private List<int> _blauVarList;
