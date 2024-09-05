@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6451849221407713924}
   - component: {fileID: 8921146467223758213}
+  - component: {fileID: 1132046044746328797}
   - component: {fileID: 8109504457860531637}
   - component: {fileID: 7348831395977296389}
   m_Layer: 0
@@ -57,6 +58,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 12.263641, y: 1, z: 12.09345}
   m_Center: {x: 0.051006317, y: -6.850817e-11, z: -0.18168591}
+--- !u!114 &1132046044746328797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 747658553907032153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba0223f8cfbbd974684b5be1345a2336, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _cardName: 
+  _elementeAnzahl: 0
+  _answer: 0
 --- !u!114 &8109504457860531637
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -255,6 +271,6 @@ SpriteRenderer:
   m_Size: {x: 12.02, y: 12.02}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0

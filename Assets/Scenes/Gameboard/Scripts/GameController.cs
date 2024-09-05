@@ -19,6 +19,13 @@ namespace Scenes.Gameboard.Scripts
         
         private bool gameIsRunning = false;
         private int playerTurn = 0;
+        private int nextMove;
+
+        //if an actioncard change an variable the gamecontroller has to check the correct input bevor the next dice roll
+        private int _newColourNumber;
+        private int _corectionTimes = 1;
+        
+        
         public TextMeshProUGUI yourTurnField ;
         public MovementScript movementScript;
         public VariablenTafel variablenTafel;
@@ -44,6 +51,8 @@ namespace Scenes.Gameboard.Scripts
         {
            // Debug.Log(this._cardStack.Length.ToString());
             this.gameIsRunning = true;
+            timerField.text = "0";
+            this.inputField.textComponent.enableWordWrapping = true;
         }
 
         private void Awake()
@@ -69,6 +78,29 @@ namespace Scenes.Gameboard.Scripts
                 {
                     TurnOfOtherPlayers();
                 }
+
+
+                if (inputFieldEnter == true && nextMove > 0 )
+                {
+                    if (Convert.ToInt32(inputField.text) != nextMove)
+                    {
+                        if (nextMove == 1)
+                        {
+                            inputField.text = "Dies war die falsche Angabe oder die der anderen Figur! Du darfst "+ nextMove + " Schritt vor gehen!";
+                        }
+                        else
+                        {
+                            inputField.text = "Dies war die falsche Angabe oder die der anderen Figur! Du darfst "+ nextMove + " Schritte vor gehen!";
+                        }
+                        
+                    }
+                    this.movementScript.Movement(nextMove);
+
+                    nextMove = 0;
+                    //inputField.text = "";
+                    inputFieldEnter = false;
+                }
+                
             }
             else
             {
@@ -86,10 +118,21 @@ namespace Scenes.Gameboard.Scripts
         
         }
 
+        public int GetPlayerTurn()
+        {
+            return this.playerTurn;
+        }
+        
         public void EndEditInputField()
         {
             inputFieldEnter = true;
         }
+
+        public void SetNextMove(int setNextMove)
+        {
+            nextMove = setNextMove;
+        }
+        
         public int GetDiceNumber()
         {
             Debug.Log("DiceNumber:"+ this._diceNumber);
@@ -98,38 +141,56 @@ namespace Scenes.Gameboard.Scripts
         
         public void SetDiceNumber(int diceNumber)
         {
-            this._diceNumber = diceNumber;
-            this.movementScript.Movement(diceNumber);
+            Debug.Log(_corectionTimes);
             
-            //Karten vom Stapel nehmen, wenn die Karte umgedreht ist.
-
-            GameObject tempCard = this._cardList[0].gameObject;
-            GameObject tempCard2 = this._riddleCardList[0].gameObject;
-            if (tempCard.GetComponent<CardFlipClick>().GetTurnState() == false)
+            ///checks correct variablentafel bevor let the player roll the next dice
+            if (_newColourNumber == variablenTafel.GetVar(movementScript.GetPositionColour()) || _corectionTimes == 0)
             {
-                tempCard.GetComponent<CardFlipClick>().ClickStateActivate();
-                
-                // TODO Wait until animation is complete 
-                this._cardList.RemoveAt(0);
-                Destroy(tempCard);
-                
-                //Karten alle um eins nach oben verschieben und neue Karte unten anfügen
-                
-                MoveCardsUp(_cardList);
-                AddCardStack(_cardList,cardPrefab,cardPrefabStack,0);
-            }
+                timerField.text = "0";
+                _corectionTimes = 1;
+                variablenTafel.SetVar(movementScript.GetPositionColour(),_newColourNumber);
+                this._diceNumber = diceNumber;
+                this.movementScript.Movement(diceNumber);
+            
+                //Karten vom Stapel nehmen, wenn die Karte umgedreht ist.
 
-            if (tempCard2.GetComponent<CardFlipClick>().GetTurnState() == false)
+                GameObject tempCard = this._cardList[0].gameObject;
+                GameObject tempCard2 = this._riddleCardList[0].gameObject;
+                if (tempCard.GetComponent<CardFlipClick>().GetTurnState() == false)
+                {
+                    tempCard.GetComponent<CardFlipClick>().ClickStateActivate();
+                
+                    // TODO Wait until animation is complete 
+                    this._cardList.RemoveAt(0);
+                    Destroy(tempCard);
+                
+                    //Karten alle um eins nach oben verschieben und neue Karte unten anfügen
+                
+                    MoveCardsUp(_cardList);
+                    AddCardStack(_cardList,cardPrefab,cardPrefabStack,0);
+                }
+
+                if (tempCard2.GetComponent<CardFlipClick>().GetTurnState() == false)
+                {
+                    tempCard2.GetComponent<CardFlipClick>().ClickStateActivate();
+                    // TODO Wait until animation is complete 
+                
+                    this._riddleCardList.RemoveAt(0);
+                    Destroy(tempCard2);
+                
+                    MoveCardsUp(_riddleCardList);
+                    AddCardStack(_riddleCardList,riddleCardPrefab,riddlePrefabStack,-100);
+                }
+                
+                
+                
+            }else
             {
-                tempCard2.GetComponent<CardFlipClick>().ClickStateActivate();
-                // TODO Wait until animation is complete 
-                
-                this._riddleCardList.RemoveAt(0);
-                Destroy(tempCard2);
-                
-                MoveCardsUp(_riddleCardList);
-                AddCardStack(_riddleCardList,riddleCardPrefab,riddlePrefabStack,-100);
+                timerField.text = "Falscher Spielzug: Überprüfe die Variablentafel! Du hast eine korrektur Möglichkeit!";
+                _corectionTimes -= 1;
             }
+            
+            
             
             
         }
@@ -198,13 +259,20 @@ namespace Scenes.Gameboard.Scripts
             
         }
 
-        void prüftAnswer()
+        public void ActionCard(int newColourNumber)
+        {
+            inputFieldEnter = false;
+            _newColourNumber = newColourNumber;
+
+        }
+
+        void CheckAnswer()
         {
             if (inputField.text.Equals(_correctAnswer.ToString()))
             {
                 Debug.Log("correct Answer");
                 inputField.text = "Richtige Antwort";
-
+                variablenTafel.gameObject.SetActive(false);
             }
             else
             {
@@ -223,13 +291,13 @@ namespace Scenes.Gameboard.Scripts
                 if (inputFieldEnter)
                 {
                     _timer.StopTimer();
-                    prüftAnswer();
+                    CheckAnswer();
                     yield break;
                 } 
                 yield return null;
             }
             
-            prüftAnswer();
+            CheckAnswer();
             
         }
     }

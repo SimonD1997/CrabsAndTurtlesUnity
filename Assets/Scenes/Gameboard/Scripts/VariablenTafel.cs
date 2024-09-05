@@ -124,6 +124,41 @@ namespace Scenes.Gameboard.Scripts
 
             return colourVar;
         }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="colour"></param>
+        /// <param name="colourVar"></param>
+        public void SetVar(int colour, int colourVar)
+        {
+            
+            switch (colour)
+            {
+                case 1: //red
+                    _aktuelleVarRot= colourVar;
+                    addToList();
+                    rotGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarRot.ToString();
+                    break;
+                case 2: //blue
+                    _aktuelleVarBlau = colourVar;
+                    addToList();
+                    blauGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarBlau.ToString();
+                    break;
+                case 3: //gruen
+                    _aktuelleVarGruen = colourVar;
+                    addToList();
+                    gruenGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarGruen.ToString();
+                    break;
+                case 4: //gelb
+                    _aktuelleVarGelb = colourVar;
+                    addToList();
+                    gelbGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarGelb.ToString();
+                    break;
+            }
+
+            
+        }
 
     }
 }

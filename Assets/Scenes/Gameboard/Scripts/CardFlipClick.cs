@@ -60,6 +60,12 @@ public class CardFlipClick : MonoBehaviour
                             Debug.Log("RiddleScript Vorhanden");
                             this.gameObject.GetComponent<RiddleScript>().StartRiddle();
                         }
+
+                        if (this.gameObject.GetComponent<ActionCard>() != null)
+                        {
+                            Debug.Log("ActionCard Vorhanden");
+                            this.gameObject.GetComponent<ActionCard>().StartAction();
+                        }
                     }
                     
                     /*
