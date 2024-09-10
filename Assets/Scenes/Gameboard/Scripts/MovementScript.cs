@@ -11,6 +11,7 @@ public class MovementScript : MonoBehaviour
     private SplineUser _splineUser;
     private Dreamteck.Splines.SplineFollower _splineFollower;
     private int aktuellePosition;
+    private Animator _anim;
     
     /// <summary>
     /// gerade positionen sind rästelkarten und ungerade sind ereigniskarten
@@ -122,7 +123,9 @@ public class MovementScript : MonoBehaviour
         _splineFollower = GetComponent<Dreamteck.Splines.SplineFollower>();
         //setzt die Anfangs und Endanimationspunkte fest.
         _splineUser.SetClipRange(_felder[0], _felder[0]);
-        
+
+        _anim = _splineUser.gameObject.GetComponent<Animator>();
+
         //setzt die Richtungsparameter bzw. lässt den start manuell auswählen
         //_splineFollower.autoStartPosition = false;
         //_splineFollower.direction = Spline.Direction.Backward;
@@ -131,9 +134,9 @@ public class MovementScript : MonoBehaviour
         //deshalb möglichkeit des von der Streckenlänge in Prozent umzurechnen
         //float splineLength = _splineFollower.spline.CalculateLength();
         //_splineFollower.SetDistance(splineLength,false,false);
-        
+
         //TODO noch Möglichkeit suchen den Abstand der Knoten vom Startpunkt auszulesen...!!!
-        
+
 
 
     }
@@ -174,7 +177,9 @@ public class MovementScript : MonoBehaviour
 
         }
         
+        _anim.SetBool("Walk",true);
         
+
     }
 
     public int GetPositionCard()
@@ -199,4 +204,11 @@ public class MovementScript : MonoBehaviour
     {
         return _positionColour;
     }
+
+    public void EndOfMovement()
+    {
+        _anim.SetBool("Walk",false);
+        
+    }
+    
 }

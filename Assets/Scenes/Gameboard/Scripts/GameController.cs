@@ -5,6 +5,7 @@ using System.Security.Policy;
 using System.Xml.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
 namespace Scenes.Gameboard.Scripts
@@ -29,6 +30,7 @@ namespace Scenes.Gameboard.Scripts
         
         public TextMeshProUGUI yourTurnField ;
         public MovementScript movementScript;
+        public Abzeichen abzeichen;
         public VariablenTafel variablenTafel;
 
         public List<MovementScript> playerMovements;
@@ -43,10 +45,13 @@ namespace Scenes.Gameboard.Scripts
         public bool inputFieldEnter = false;
         public TMP_InputField inputField;
         public TextMeshProUGUI timerField;
+        public Button confirmButton;
+        private bool confirmButtonEnter = false;
         
         //private GameObject[] _cardStack;
         private List<GameObject> _cardList;
         private List<GameObject> _riddleCardList;
+        private List<int> _abzeichenList;
     
     
         // Start is called before the first frame update
@@ -62,6 +67,8 @@ namespace Scenes.Gameboard.Scripts
         {
             _cardList = new List<GameObject>();
             _riddleCardList = new List<GameObject>();
+            _abzeichenList = new List<int>();
+            
             
             //_cardStack = new GameObject[5];
             CardStack();
@@ -137,14 +144,14 @@ namespace Scenes.Gameboard.Scripts
             if (playerTurn < maxPlayer - 1)
             {
                 playerTurn += 1;
-                this.movementScript = playerMovements[playerTurn];
             }
             else
             {
                 playerTurn = 0;
-                this.movementScript = playerMovements[playerTurn];
             }
-
+            this.movementScript = playerMovements[playerTurn];
+            this.abzeichen = this.movementScript.gameObject.GetComponent<Abzeichen>();
+            this.abzeichen.showAbzeichen();
         }
 
         public int GetPlayerTurn()
@@ -155,6 +162,11 @@ namespace Scenes.Gameboard.Scripts
         public void EndEditInputField()
         {
             inputFieldEnter = true;
+        }
+
+        public void ConfirmButtonClick()
+        {
+            confirmButtonEnter = true;
         }
 
         public void SetNextMove(int setNextMove)
@@ -168,29 +180,18 @@ namespace Scenes.Gameboard.Scripts
             return this._diceNumber;
         }
         
+        
+        
         public void SetDiceNumber(int diceNumber)
         {
-            Debug.Log(_corectionTimes);
+            
             inputField.text = "";
             
-            ///checks correct variablentafel bevor let the player roll the next dice
-            if (_newColourNumber == variablenTafel.GetVar(movementScript.GetPositionColour()) || _corectionTimes == 0)
+            if ( _actionCardState == false)
             {
-                variablenTafel.gameObject.SetActive(false);
-                if (_actionCardState)
-                {
-                    NextPlayer();
-                    _actionCardState = false;
-                }
                 
                 timerField.text = "0";
                 _corectionTimes = 1;
-                
-                //sets colour in Variablentafel (-999 stands für player movement and no variable change)
-                if (_newColourNumber != -999)
-                {
-                    variablenTafel.SetVar(movementScript.GetPositionColour(),_newColourNumber);
-                }
                 
                 this._diceNumber = diceNumber;
                 
@@ -229,10 +230,6 @@ namespace Scenes.Gameboard.Scripts
                     AddCardStack(_riddleCardList,riddleCardPrefab,riddlePrefabStack,-100);
                 }
                 
-            }else
-            {
-                timerField.text = "Falscher Spielzug: Überprüfe die Variablentafel! Du hast eine korrektur Möglichkeit!";
-                _corectionTimes -= 1;
             }
             
         }
@@ -295,37 +292,43 @@ namespace Scenes.Gameboard.Scripts
            
         }
 
-        public void StartRiddle(int correctAnswer, Timer timer)
+        public void StartRiddle(int correctAnswer, Timer timer, List<int> abzeichenList)
         {
             inputField.text = "";
             inputFieldEnter = false;
             _timer =  timer;
             _correctAnswer = correctAnswer;
+            _timer.SetTimerText("Timer: ");
             _timer.timeRemaining = 30;
             //_timer.text = this.timerField;
             _timer.StartTimer();
             
+            _abzeichenList = abzeichenList;
             
             StartCoroutine(Waiter());
             
-            
         }
 
-        public void ActionCard(int newColourNumber)
+        public void ActionCard(int newColourNumber,List<int> abzeichenList)
         {
             inputFieldEnter = false;
             _newColourNumber = newColourNumber;
             _actionCardState = true;
+            _abzeichenList = abzeichenList;
+            StartCoroutine(Waiter3());
 
         }
 
-        void CheckAnswer()
+        void CheckAnswer(bool firstTry)
         {
+            
             if (inputField.text.Equals(_correctAnswer.ToString()))
             {
                 Debug.Log("correct Answer");
                 inputField.text = "Richtige Antwort";
                 variablenTafel.gameObject.SetActive(false);
+                
+                
                 
                 //flip Card after correct Answer
                 GameObject tempCard = this._riddleCardList[0].gameObject;
@@ -338,13 +341,34 @@ namespace Scenes.Gameboard.Scripts
                 }
                 
             }
-            else
+            else 
             {
                 Debug.Log("wrong Answer");
                 inputField.text = "Falsche Antwort";
-                
+                if (firstTry)
+                {
+                    StartCoroutine(Waiter2());  
+                }
+                else
+                {
+                    variablenTafel.gameObject.SetActive(false);
+                    //flip Card after last Try
+                    GameObject tempCard = this._riddleCardList[0].gameObject;
+                    if (tempCard.GetComponent<CardFlipClick>().GetTurnState() == false)
+                    {
+                        StartCoroutine(WaiterAnimator(tempCard));
+                        this._riddleCardList.RemoveAt(0);
+                        MoveCardsUp(_riddleCardList);
+                        AddCardStack(_riddleCardList,riddleCardPrefab,riddlePrefabStack,-100);
+                    }
+                }
             }
-            NextPlayer();
+
+            if (firstTry)
+            {
+                NextPlayer();
+            }
+            
         }
         IEnumerator Waiter()
         {
@@ -356,15 +380,119 @@ namespace Scenes.Gameboard.Scripts
                 if (inputFieldEnter)
                 {
                     _timer.StopTimer();
-                    CheckAnswer();
+                    CheckAnswer(true);
                     yield break;
                 } 
                 yield return null;
             }
+            CheckAnswer(true);
+        }
+        /// <summary>
+        /// Waiter and Timer for second try from second player after wrong answer
+        /// </summary>
+        /// <returns></returns>
+        IEnumerator Waiter2()
+        {
+            _timer.SetTimerText("Zeit zum weitergeben: ");
+            _timer.timeRemaining = 5;
+            inputField.text = "Falsche Antwort! Das andere Team bekommt die Chance!";
+            _timer.StartTimer();
+            yield return new WaitForSeconds(5);
             
-            CheckAnswer();
+            inputField.text = "";
+            inputFieldEnter = false;
+            _timer.SetTimerText("Timer: ");
+            _timer.timeRemaining = 30;
+            _timer.StartTimer();
             
+            Debug.Log("correct Answer:" + _correctAnswer);
             
+            while (_timer.timerIsRunning && _timer.timeRemaining != 0)
+            {
+                if (inputFieldEnter)
+                {
+                    _timer.StopTimer();
+                    CheckAnswer(false);
+                    yield break;
+                } 
+                yield return null;
+            }
+            CheckAnswer(false);
+            
+        }
+
+        IEnumerator Waiter3()
+        {
+            confirmButtonEnter = false;
+            while (true)
+            {
+                
+                ///checks correct variablentafel bevor let the player roll the next dice
+                if ((_newColourNumber == variablenTafel.GetVar(movementScript.GetPositionColour()) ||
+                     _corectionTimes == 0) && confirmButtonEnter)
+                {
+                    variablenTafel.gameObject.SetActive(false);
+
+                    if (_corectionTimes == 1)
+                    {
+                        // AbzeichenTest 
+                        abzeichen.AddAbzeichen(_abzeichenList);
+                        
+                    }
+                    
+                    NextPlayer();
+                    
+                    _actionCardState = false;
+
+
+                    timerField.text = "0";
+                    _corectionTimes = 1;
+
+                    //Karten vom Stapel nehmen, wenn die Karte umgedreht ist.
+                    GameObject tempCard = this._cardList[0].gameObject;
+                    StartCoroutine(WaiterAnimator(tempCard));
+                    this._cardList.RemoveAt(0);
+                    //Karten alle um eins nach oben verschieben und neue Karte unten anfügen
+                    MoveCardsUp(_cardList);
+                    AddCardStack(_cardList, cardPrefab, cardPrefabStack, 0);
+
+
+                    //sets colour in Variablentafel (-999 stands für player movement and no variable change)
+                    if (_newColourNumber != -999)
+                    {
+                        variablenTafel.SetVar(movementScript.GetPositionColour(), _newColourNumber);
+
+                    }
+
+                    yield break;
+
+                }else if (confirmButtonEnter)
+                {
+                    timerField.text =
+                        "Falscher Spielzug: Überprüfe die Variablentafel! Du hast eine korrektur Möglichkeit!";
+                    _corectionTimes -= 1;
+                    confirmButtonEnter = false;
+                }else if (_newColourNumber == -999 && nextMove == 0)
+                {
+                    NextPlayer();
+                    _actionCardState = false;
+                    inputField.text = "";
+                    inputField.placeholder.gameObject.GetComponent<TextMeshProUGUI>().text =
+                        "Eingabefeld";
+                    
+                    //Karten vom Stapel nehmen, wenn die Karte umgedreht ist.
+                    GameObject tempCard = this._cardList[0].gameObject;
+                    StartCoroutine(WaiterAnimator(tempCard));
+                    this._cardList.RemoveAt(0);
+                    //Karten alle um eins nach oben verschieben und neue Karte unten anfügen
+                    MoveCardsUp(_cardList);
+                    AddCardStack(_cardList, cardPrefab, cardPrefabStack, 0);
+                    
+                    yield break;
+                }
+
+                yield return null;
+            }
         }
     }
 }

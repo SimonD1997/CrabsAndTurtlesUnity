@@ -15,6 +15,9 @@ public class RiddleScript : MonoBehaviour
     private List<int> _elementeRightAnswer;
     public int _answer;
     int index;
+    
+    //Gets the Abzeichen possible to get after an correct answer
+    private List<int> _abzeichen;
 
     private void Start()
     {
@@ -41,18 +44,21 @@ public class RiddleScript : MonoBehaviour
                 
                 if (_cardName[index].ToString() == "+")
                 {
+                    _abzeichen.Add(0);
                     Debug.Log(_cardName[index].ToString());
                     _elemente.Add(Convert.ToByte(_cardName[index+1].ToString()));
                     _elementeRightAnswer.Add(ElementWert(Convert.ToByte(_cardName[index+1].ToString())));
                     _answer = _elementeRightAnswer[0] + _elementeRightAnswer[1];
                 }else if (_cardName[index].ToString() == "-")
                 {
+                    _abzeichen.Add(2);
                     Debug.Log(_cardName[index].ToString());
                     _elemente.Add(Convert.ToByte(_cardName[index+1].ToString()));
                     _elementeRightAnswer.Add(ElementWert(Convert.ToByte(_cardName[index+1].ToString())));
                     _answer = _elementeRightAnswer[0] - _elementeRightAnswer[1];
                 }else if (_cardName[index].ToString() == ".")
                 {
+                    _abzeichen.Add(1);
                     Debug.Log(_cardName[index].ToString());
                     _elemente.Add(Convert.ToByte(_cardName[index+1].ToString()));
                     _elementeRightAnswer.Add(ElementWert(Convert.ToByte(_cardName[index+1].ToString())));
@@ -70,16 +76,19 @@ public class RiddleScript : MonoBehaviour
                 
                 if (_cardName[index].ToString() == "+")
                 {
+                    _abzeichen.Add(0);
                     _elemente.Add(Convert.ToByte(_cardName[index+1].ToString()));
                     _elementeRightAnswer.Add(ElementWert(Convert.ToByte(_cardName[index+1].ToString())));
                     _answer = _elementeRightAnswer[0] + _elementeRightAnswer[1];
                 }else if (_cardName[index].ToString() == "-")
                 {
+                    _abzeichen.Add(2);
                     _elemente.Add(Convert.ToByte(_cardName[index+1].ToString()));
                     _elementeRightAnswer.Add(ElementWert(Convert.ToByte(_cardName[index+1].ToString())));
                     _answer = _elementeRightAnswer[0] - _elementeRightAnswer[1];
                 }else if (_cardName[index].ToString() == ".")
                 {
+                    _abzeichen.Add(1);
                     _elemente.Add(Convert.ToByte(_cardName[index+1].ToString()));
                     _elementeRightAnswer.Add(ElementWert(Convert.ToByte(_cardName[index+1].ToString())));
                     _answer = _elementeRightAnswer[0] * _elementeRightAnswer[1];
@@ -91,17 +100,20 @@ public class RiddleScript : MonoBehaviour
                 
                 if (_cardName[index].ToString() == "+")
                 {
+                    _abzeichen.Add(0);
                     _elemente.Add(Convert.ToByte(_cardName[index+1].ToString()));
                     _elementeRightAnswer.Add(ElementWert(Convert.ToByte(_cardName[index+1].ToString())));
                     // out of Bound Error??? deshalb von 2 auf 1 geändert???
                     _answer = _answer + _elementeRightAnswer[2];
                 }else if (_cardName[index].ToString() == "-")
                 {
+                    _abzeichen.Add(2);
                     _elemente.Add(Convert.ToByte(_cardName[index+1].ToString()));
                     _elementeRightAnswer.Add(ElementWert(Convert.ToByte(_cardName[index+1].ToString())));
                     _answer = _answer - _elementeRightAnswer[2];
                 }else if (_cardName[index].ToString() == ".")
                 {
+                    _abzeichen.Add(1);
                     _elemente.Add(Convert.ToByte(_cardName[index+1].ToString()));
                     _elementeRightAnswer.Add(ElementWert(Convert.ToByte(_cardName[index+1].ToString())));
                     _answer = _answer * _elementeRightAnswer[2];
@@ -144,10 +156,12 @@ public class RiddleScript : MonoBehaviour
         switch (elementCode)
         {
             case 1:
+                _abzeichen.Add(5);
                 elementWert = this._gameController.movementScript.GetPosition();
                 Debug.Log("Position: "+ elementWert);
                 break;
             case 2:
+                _abzeichen.Add(4);
                 Debug.Log(_gameController.movementScript.GetPositionColour());
                 Debug.Log(this._variablenTafel.name);
                 Debug.Log(this._variablenTafel.GetVar(_gameController.movementScript.GetPositionColour()));
@@ -155,6 +169,7 @@ public class RiddleScript : MonoBehaviour
                 Debug.Log(elementWert);
                 break;
             case 3:
+                _abzeichen.Add(4);
                 elementWert = this._gameController.GetDiceNumber();
                 Debug.Log("DiceRoll: "+elementWert);
                 break;
@@ -177,7 +192,7 @@ public class RiddleScript : MonoBehaviour
         timer.text = _gameController.timerField;
         //timer.StartTimer();
         //timer.timerIsRunning = true;
-        _gameController.StartRiddle(_answer, timer);
+        _gameController.StartRiddle(_answer, timer, _abzeichen);
         
     }
 }

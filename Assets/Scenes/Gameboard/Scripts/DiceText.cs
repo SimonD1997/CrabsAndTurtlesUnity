@@ -6,11 +6,12 @@ namespace Scenes.Gameboard.Scripts
     public class DiceText : MonoBehaviour
     {
         private TMP_Text diceText;
-        public GameController gameController;
+        private GameController _gameController;
     
         // Start is called before the first frame update
         void Start()
         {
+            _gameController = FindObjectOfType<GameController>();
             diceText = this.gameObject.GetComponentInChildren<TMP_Text>();
             //Dice();
             Debug.Log("DiceText");
@@ -31,7 +32,7 @@ namespace Scenes.Gameboard.Scripts
             int diceRoll = Random.Range(1, 6);
             diceText.text = diceRoll.ToString(); 
             Debug.Log(diceRoll);
-            this.gameController.SetDiceNumber(diceRoll);
+            this._gameController.SetDiceNumber(diceRoll);
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using TMPro;
 
@@ -9,6 +10,8 @@ namespace Scenes.Gameboard.Scripts
         public float timeRemaining = 30;
         private string _timeText;
         public bool timerIsRunning = false;
+        
+        
         
         // Update is called once per frame
         void Update()
@@ -28,7 +31,7 @@ namespace Scenes.Gameboard.Scripts
                 //Debug.Log("Timer:" + timeRemaining);
                 
             }
-            this.text.text = timeRemaining.ToString();
+            this.text.text = _timeText + Convert.ToInt32(timeRemaining).ToString();
             
            
         }
@@ -42,6 +45,11 @@ namespace Scenes.Gameboard.Scripts
         {
             timerIsRunning = false;
             timeRemaining = 0;
+        }
+
+        public void SetTimerText(string timerText)
+        {
+            _timeText = timerText;
         }
     }
 }

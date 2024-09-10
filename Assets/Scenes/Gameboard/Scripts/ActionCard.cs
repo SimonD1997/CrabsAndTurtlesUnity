@@ -12,15 +12,18 @@ public class ActionCard : MonoBehaviour
     private VariablenTafel _variablenTafel;
     public string _cardName;
     public byte _elementeAnzahl;
-    private int index;
-    
     
     //New Variables to check with input from players
     private int _colourVariablesNew;
+
+    //Gets the Abzeichen possible to get after an correct answer
+    private List<int> _abzeichen;
     
     //Start is called before the first frame update
     void Start()
     {
+        _abzeichen = new List<int>();
+        
         _gameController = FindObjectOfType<GameController>();
         _variablenTafel = this._gameController.variablenTafel;
         
@@ -37,7 +40,6 @@ public class ActionCard : MonoBehaviour
 
     private void CollectAnswer()
     {
-        index = 1;
         int elementWert;
         switch (_elementeAnzahl)
         {
@@ -48,10 +50,12 @@ public class ActionCard : MonoBehaviour
                 {
                     _colourVariablesNew = this._variablenTafel.GetVar(_gameController.movementScript.GetPositionColour()) +
                                           elementWert;
+                    _abzeichen.Add(4);
 
                 }else if (_cardName[3].ToString() == "=")
                 {
                     _colourVariablesNew = elementWert;
+                    _abzeichen.Add(4);
                 }
                 break;
             case 2:
@@ -75,6 +79,7 @@ public class ActionCard : MonoBehaviour
                  
                 break;
             case 3:
+                _abzeichen.Add(3);
                 _gameController.variablenTafel.gameObject.SetActive(true);
                 int positionColour = this._variablenTafel.GetVar(_gameController.movementScript.GetPositionColour());
                 if (_cardName[3].ToString() == "g")
@@ -101,6 +106,7 @@ public class ActionCard : MonoBehaviour
                         _colourVariablesNew = Calculate(_cardName[9].ToString(), positionColour,
                             Convert.ToInt32(_cardName[7..9]));
                     }
+                    
                 }
                 break;
         }
@@ -112,12 +118,15 @@ public class ActionCard : MonoBehaviour
         int answer = 0;
         if (operation == "+")
         {
+            _abzeichen.Add(0);
             answer = firstNumber + secondNumber;
         }else if (operation == "-")
         {
+            _abzeichen.Add(2);
             answer = firstNumber - secondNumber;
         }else if (operation == ".")
         {
+            _abzeichen.Add(1);
             answer = firstNumber * secondNumber;
         }else if (operation == ":")
         {
@@ -134,7 +143,7 @@ public class ActionCard : MonoBehaviour
     public void StartAction()
     {
         CollectAnswer();
-        _gameController.ActionCard(_colourVariablesNew);
+        _gameController.ActionCard(_colourVariablesNew,_abzeichen);
         // doch direkt oben verwendet, da nicht bei allen Karten die Variablentafel gebraucht wird...
         //_gameController.variablenTafel.gameObject.SetActive(true);
     }
