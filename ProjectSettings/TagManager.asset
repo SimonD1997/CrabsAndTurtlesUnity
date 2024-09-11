@@ -21,8 +21,8 @@ TagManager:
   - 
   - Screen
   - Occluder
-  - Camera
-  - MainCameraOnly
+  - Crab(Camera)
+  - Turtle(Camera)
   - 
   - 
   - 

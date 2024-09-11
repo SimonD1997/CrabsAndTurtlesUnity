@@ -7,11 +7,12 @@ using UnityEngine;
 
 public class MovementScript : MonoBehaviour
 {
-    public TMP_InputField input;
+    public GameObject _canvas;
     private SplineUser _splineUser;
     private Dreamteck.Splines.SplineFollower _splineFollower;
     private int aktuellePosition;
     private Animator _anim;
+    private Camera _camera;
     
     /// <summary>
     /// gerade positionen sind rästelkarten und ungerade sind ereigniskarten
@@ -125,6 +126,7 @@ public class MovementScript : MonoBehaviour
         _splineUser.SetClipRange(_felder[0], _felder[0]);
 
         _anim = _splineUser.gameObject.GetComponent<Animator>();
+        _camera = this.gameObject.GetComponentInChildren<Camera>();
 
         //setzt die Richtungsparameter bzw. lässt den start manuell auswählen
         //_splineFollower.autoStartPosition = false;
@@ -140,6 +142,12 @@ public class MovementScript : MonoBehaviour
 
 
     }
+
+    public void SetCameraActiv(bool activ)
+    {
+        _camera.enabled = activ;
+        //_canvas.SetActive(activ);
+    } 
 
     // Update is called once per frame
     void Update()

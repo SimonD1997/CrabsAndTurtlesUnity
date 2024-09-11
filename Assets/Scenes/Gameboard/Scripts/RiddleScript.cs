@@ -21,6 +21,8 @@ public class RiddleScript : MonoBehaviour
 
     private void Start()
     {
+        _abzeichen = new List<int>();
+        
         _gameController = FindObjectOfType<GameController>();
         _variablenTafel = this._gameController.variablenTafel;
         _elemente = new List<byte>();

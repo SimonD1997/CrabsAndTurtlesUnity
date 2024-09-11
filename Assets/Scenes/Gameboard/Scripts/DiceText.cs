@@ -29,7 +29,7 @@ namespace Scenes.Gameboard.Scripts
     
         public void Dice()
         {
-            int diceRoll = Random.Range(1, 6);
+            int diceRoll = Random.Range(1, 7);
             diceText.text = diceRoll.ToString(); 
             Debug.Log(diceRoll);
             this._gameController.SetDiceNumber(diceRoll);

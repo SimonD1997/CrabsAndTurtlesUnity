@@ -8,6 +8,7 @@ namespace Scenes.Gameboard.Scripts
         public List<AbzeichenObjects> _abzeichenList;
         public Sprite[] _spriteList;
         private Inventory _inventory;
+        public Sprite _spriteIcon;
         
         
 /// <summary>
@@ -22,15 +23,43 @@ namespace Scenes.Gameboard.Scripts
 /// <param name="abzeichenNumber"></param>
         public void AddAbzeichen(List<int> abzeichenNumber)
         {
+            int[] tempAbzeichenArray = new int[6] {9,9,9,9,9,9};
             foreach (var VARIABLE in abzeichenNumber)
             {
-                if (_abzeichenList.Exists(objects => objects.GetAbzeichenNumber() == VARIABLE))
+                if (VARIABLE == 0)
                 {
-                    _abzeichenList.Find(objects => objects.GetAbzeichenNumber() == VARIABLE).SetAbzeichenCount(1);
+                    tempAbzeichenArray[0] = 0;
+                }else if (VARIABLE == 1)
+                {
+                    tempAbzeichenArray[1] = 1;
+                }else if (VARIABLE == 2)
+                {
+                    tempAbzeichenArray[2] = 2;
+                }else if (VARIABLE == 3)
+                {
+                    tempAbzeichenArray[3] = 3;
+                }else if (VARIABLE == 4)
+                {
+                    tempAbzeichenArray[4] = 4;
+                }else if (VARIABLE == 5)
+                {
+                    tempAbzeichenArray[5] = 5;
                 }
-                else
+            }
+            
+            
+            foreach (var tempVar in tempAbzeichenArray)
+            {
+                if (_abzeichenList.Exists(objects => objects.GetAbzeichenNumber() == tempVar))
                 {
-                    AbzeichenObjects abzeichenObjects = new AbzeichenObjects(VARIABLE,_spriteList[VARIABLE]);
+                    _abzeichenList.Find(objects => objects.GetAbzeichenNumber() == tempVar).SetAbzeichenCount(1);
+                }
+                else if (tempVar == 9)
+                {
+                    // do nothing
+                }else
+                {
+                    AbzeichenObjects abzeichenObjects = new AbzeichenObjects(tempVar,_spriteList[tempVar]);
                     _abzeichenList.Add(abzeichenObjects);
                 }
                 
@@ -59,6 +88,7 @@ namespace Scenes.Gameboard.Scripts
         public void showAbzeichen()
         {
             _inventory.SetInventory(_abzeichenList);
+            _inventory.SetPlayerIcon(_spriteIcon);
         }
 
         // Update is called once per frame

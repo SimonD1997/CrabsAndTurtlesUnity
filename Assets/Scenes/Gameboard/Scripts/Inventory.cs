@@ -1,51 +1,58 @@
-using System.Collections;
 using System.Collections.Generic;
-using Scenes.Gameboard.Scripts;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Inventory : MonoBehaviour
+namespace Scenes.Gameboard.Scripts
 {
-    public Image[] imageSlots;
-    private AbzeichenObjects[] _abzeichenObjectsArray;
+    public class Inventory : MonoBehaviour
+    {
+        public Image[] imageSlots;
+        private AbzeichenObjects[] _abzeichenObjectsArray;
+        public Image playerIcon;
     
-    // Start is called before the first frame update
-    void Start()
-    {
-        _abzeichenObjectsArray = new AbzeichenObjects[imageSlots.Length];
-    }
-
-    public void SetInventory(List<AbzeichenObjects> abzeichenObjectsList)
-    {
-        for (int i = 0; i < abzeichenObjectsList.Count; i++)
+        // Start is called before the first frame update
+        void Start()
         {
-            _abzeichenObjectsArray[i] = abzeichenObjectsList[i];
-            imageSlots[i].enabled = true;
-            imageSlots[i].sprite = abzeichenObjectsList[i].GetSprite();
+            _abzeichenObjectsArray = new AbzeichenObjects[imageSlots.Length];
+        }
 
-            int abzeichennumber = abzeichenObjectsList[i].GetAbzeichenCount();
-            if (abzeichennumber > 1)
+        public void SetInventory(List<AbzeichenObjects> abzeichenObjectsList)
+        {
+            for (int i = 0; i < abzeichenObjectsList.Count; i++)
             {
-                imageSlots[i].gameObject.GetComponentInChildren<TMP_Text>().text = abzeichennumber.ToString();
-            }
-            else
-            {
-                imageSlots[i].gameObject.GetComponentInChildren<TMP_Text>().text = "";
-            }
+                _abzeichenObjectsArray[i] = abzeichenObjectsList[i];
+                imageSlots[i].enabled = true;
+                imageSlots[i].sprite = abzeichenObjectsList[i].GetSprite();
+
+                int abzeichennumber = abzeichenObjectsList[i].GetAbzeichenCount();
+                if (abzeichennumber > 1)
+                {
+                    imageSlots[i].gameObject.GetComponentInChildren<TMP_Text>().text = abzeichennumber.ToString();
+                }
+                else
+                {
+                    imageSlots[i].gameObject.GetComponentInChildren<TMP_Text>().text = "";
+                }
             
+            }
+
+            for (int i = abzeichenObjectsList.Count; i < (imageSlots.Length - (abzeichenObjectsList.Count)); i++)
+            {
+                imageSlots[i].enabled = false;
+            }
+        
         }
 
-        for (int i = abzeichenObjectsList.Count; i < (imageSlots.Length - (abzeichenObjectsList.Count)); i++)
+        public void SetPlayerIcon(Sprite playerIcon)
         {
-            imageSlots[i].enabled = false;
+            this.playerIcon.sprite = playerIcon;
         }
-        
-    }
     
-    // Update is called once per frame
-    void Update()
-    {
+        // Update is called once per frame
+        void Update()
+        {
         
+        }
     }
 }

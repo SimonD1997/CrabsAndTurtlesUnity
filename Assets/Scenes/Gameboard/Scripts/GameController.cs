@@ -30,6 +30,7 @@ namespace Scenes.Gameboard.Scripts
         
         public TextMeshProUGUI yourTurnField ;
         public MovementScript movementScript;
+        private MovementScript lastMovementScript;
         public Abzeichen abzeichen;
         public VariablenTafel variablenTafel;
 
@@ -61,6 +62,16 @@ namespace Scenes.Gameboard.Scripts
             this.gameIsRunning = true;
             timerField.text = "0";
             this.inputField.textComponent.enableWordWrapping = true;
+            
+            //Starts the Game:
+            playerTurn = Random.Range(0, 2);
+            
+            movementScript = playerMovements[playerTurn];
+            lastMovementScript = movementScript;
+            
+            abzeichen = movementScript.gameObject.GetComponent<Abzeichen>();
+            abzeichen.showAbzeichen();
+
         }
 
         private void Awake()
@@ -139,7 +150,11 @@ namespace Scenes.Gameboard.Scripts
 /// </summary>
         void NextPlayer()
         {
-            this.movementScript.gameObject.GetComponentInChildren<Camera>().enabled = false;
+            // sonst wird beim zweiten player/versuch die abzeichen nicht angefügt...
+            //_abzeichenList.Clear();
+
+            this.lastMovementScript = this.movementScript;
+            
             int maxPlayer = 2;
             if (playerTurn < maxPlayer - 1)
             {
@@ -196,8 +211,11 @@ namespace Scenes.Gameboard.Scripts
                 this._diceNumber = diceNumber;
                 
                 //Camera from player enabled
-                movementScript.gameObject.GetComponentInChildren<Camera>().enabled = true;
+                lastMovementScript = movementScript;
+                lastMovementScript.SetCameraActiv(true);
                 this.movementScript.Movement(diceNumber);
+                
+                this.abzeichen.showAbzeichen();
             
                 //Karten vom Stapel nehmen, wenn die Karte umgedreht ist.
 
@@ -294,6 +312,8 @@ namespace Scenes.Gameboard.Scripts
 
         public void StartRiddle(int correctAnswer, Timer timer, List<int> abzeichenList)
         {
+            this.lastMovementScript = this.movementScript;
+            
             inputField.text = "";
             inputFieldEnter = false;
             _timer =  timer;
@@ -326,8 +346,12 @@ namespace Scenes.Gameboard.Scripts
             {
                 Debug.Log("correct Answer");
                 inputField.text = "Richtige Antwort";
-                variablenTafel.gameObject.SetActive(false);
                 
+                variablenTafel.gameObject.SetActive(false);
+                this.lastMovementScript.SetCameraActiv(false);
+                
+                
+                abzeichen.AddAbzeichen(_abzeichenList);
                 
                 
                 //flip Card after correct Answer
@@ -351,7 +375,11 @@ namespace Scenes.Gameboard.Scripts
                 }
                 else
                 {
+                    
+                    
                     variablenTafel.gameObject.SetActive(false);
+                    this.lastMovementScript.SetCameraActiv(false);
+                    
                     //flip Card after last Try
                     GameObject tempCard = this._riddleCardList[0].gameObject;
                     if (tempCard.GetComponent<CardFlipClick>().GetTurnState() == false)
@@ -367,6 +395,7 @@ namespace Scenes.Gameboard.Scripts
             if (firstTry)
             {
                 NextPlayer();
+                
             }
             
         }
@@ -413,12 +442,15 @@ namespace Scenes.Gameboard.Scripts
                 {
                     _timer.StopTimer();
                     CheckAnswer(false);
+                    //important for update if player 2 gets the right answer
+                    abzeichen.showAbzeichen();
                     yield break;
                 } 
                 yield return null;
             }
             CheckAnswer(false);
-            
+            //important for update if player 2 gets the right answer
+            abzeichen.showAbzeichen();
         }
 
         IEnumerator Waiter3()
@@ -438,9 +470,12 @@ namespace Scenes.Gameboard.Scripts
                         // AbzeichenTest 
                         abzeichen.AddAbzeichen(_abzeichenList);
                         
+                        
                     }
                     
+                    
                     NextPlayer();
+                    this.lastMovementScript.SetCameraActiv(false);
                     
                     _actionCardState = false;
 
@@ -474,7 +509,12 @@ namespace Scenes.Gameboard.Scripts
                     confirmButtonEnter = false;
                 }else if (_newColourNumber == -999 && nextMove == 0)
                 {
+                    abzeichen.AddAbzeichen(_abzeichenList);
+                    
+                    
                     NextPlayer();
+                    this.lastMovementScript.SetCameraActiv(false);
+                    
                     _actionCardState = false;
                     inputField.text = "";
                     inputField.placeholder.gameObject.GetComponent<TextMeshProUGUI>().text =
