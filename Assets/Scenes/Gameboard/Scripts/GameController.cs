@@ -244,7 +244,7 @@ namespace Scenes.Gameboard.Scripts
                     //Karten alle um eins nach oben verschieben und neue Karte unten anfügen
                 
                     MoveCardsUp(_cardList);
-                    AddCardStack(_cardList,cardPrefab,cardPrefabStack,0);
+                    AddCardStack(_cardList,cardPrefab,cardPrefabStack,4);
                 }
 
                 if (tempCard2.GetComponent<CardFlipClick>().GetTurnState() == false)
@@ -257,7 +257,7 @@ namespace Scenes.Gameboard.Scripts
                     
                 
                     MoveCardsUp(_riddleCardList);
-                    AddCardStack(_riddleCardList,riddleCardPrefab,riddlePrefabStack,-100);
+                    AddCardStack(_riddleCardList,riddleCardPrefab,riddlePrefabStack,-15);
                 }
                 
             }
@@ -323,7 +323,7 @@ namespace Scenes.Gameboard.Scripts
             
             for (int i = 0; i < 5; i++)
             {
-                GameObject tempCard = Instantiate(riddleCardPrefab, new Vector3(-400, -100, i*5), riddleCardPrefab.transform.rotation);
+                GameObject tempCard = Instantiate(riddleCardPrefab, new Vector3(-40, -15, i), riddleCardPrefab.transform.rotation);
                 //tempCard.transform.rotation.Set(89,0,0,0 );
                 tempCard.GetComponentInChildren<SpriteRenderer>().sprite = riddlePrefabStack[Random.Range(0,riddlePrefabStack.Length)];
                 //this._cardStack[i] = tempCard;
@@ -332,7 +332,7 @@ namespace Scenes.Gameboard.Scripts
             }
             for (int i = 0; i < 5; i++)
             {
-                GameObject tempCard = Instantiate(cardPrefab, new Vector3(-400, 0, i*5), riddleCardPrefab.transform.rotation);
+                GameObject tempCard = Instantiate(cardPrefab, new Vector3(-40, 4, i), riddleCardPrefab.transform.rotation);
                 tempCard.GetComponentInChildren<SpriteRenderer>().sprite = cardPrefabStack[Random.Range(0,cardPrefabStack.Length)];
                 _cardList.Add(tempCard);
             }
@@ -351,7 +351,7 @@ namespace Scenes.Gameboard.Scripts
             {
                 Vector3 tempVector = o.transform.position;
                 Debug.Log(tempVector);
-                tempVector.z = o.transform.position.z - 5;
+                tempVector.z = o.transform.position.z - 1;
                 o.transform.position = tempVector;
                 Debug.Log(tempVector);
             }
@@ -361,7 +361,7 @@ namespace Scenes.Gameboard.Scripts
 
         private void AddCardStack(List<GameObject> cardList, GameObject prefab, Sprite[] spriteStack,int yPosition)
         {
-            GameObject tempCard = Instantiate(prefab, new Vector3(-400, yPosition, 20), riddleCardPrefab.transform.rotation);
+            GameObject tempCard = Instantiate(prefab, new Vector3(-40, yPosition, 4), riddleCardPrefab.transform.rotation);
             tempCard.GetComponentInChildren<SpriteRenderer>().sprite = spriteStack[Random.Range(0,spriteStack.Length)];
             cardList.Add(tempCard);
            
@@ -430,7 +430,7 @@ namespace Scenes.Gameboard.Scripts
                     StartCoroutine(WaiterAnimator(tempCard));
                     this._riddleCardList.RemoveAt(0);
                     MoveCardsUp(_riddleCardList);
-                    AddCardStack(_riddleCardList,riddleCardPrefab,riddlePrefabStack,-100);
+                    AddCardStack(_riddleCardList,riddleCardPrefab,riddlePrefabStack,-15);
                 }
                 
                 StartCoroutine(WaiterToEndOfMove());
@@ -460,7 +460,7 @@ namespace Scenes.Gameboard.Scripts
                         StartCoroutine(WaiterAnimator(tempCard));
                         this._riddleCardList.RemoveAt(0);
                         MoveCardsUp(_riddleCardList);
-                        AddCardStack(_riddleCardList,riddleCardPrefab,riddlePrefabStack,-100);
+                        AddCardStack(_riddleCardList,riddleCardPrefab,riddlePrefabStack,-15);
                     }
                     
                     StartCoroutine(WaiterToEndOfMove());
@@ -585,7 +585,7 @@ namespace Scenes.Gameboard.Scripts
                     this._cardList.RemoveAt(0);
                     //Karten alle um eins nach oben verschieben und neue Karte unten anfügen
                     MoveCardsUp(_cardList);
-                    AddCardStack(_cardList, cardPrefab, cardPrefabStack, 0);
+                    AddCardStack(_cardList, cardPrefab, cardPrefabStack, 4);
 
                     
 
@@ -629,7 +629,7 @@ namespace Scenes.Gameboard.Scripts
                     this._cardList.RemoveAt(0);
                     //Karten alle um eins nach oben verschieben und neue Karte unten anfügen
                     MoveCardsUp(_cardList);
-                    AddCardStack(_cardList, cardPrefab, cardPrefabStack, 0);
+                    AddCardStack(_cardList, cardPrefab, cardPrefabStack, 4);
                     
                     
                     

@@ -36,6 +36,18 @@ namespace Scenes.Gameboard.Scripts
 
         }
 
+        public void switchGameobjectState()
+        {
+            if (this.gameObject.activeSelf)
+            {
+                this.gameObject.SetActive(false);
+            }
+            else
+            {
+                this.gameObject.SetActive(true);
+            }
+        }
+
         // Update is called once per frame
         void Update()
         {
