@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -5,11 +7,15 @@ namespace Scenes.Gameboard.Scripts
 {
     public class Abzeichen : MonoBehaviour
     {
+        private GameController _gameController;
+        
         public List<AbzeichenObjects> _abzeichenList;
         public Sprite[] _spriteList;
         private Inventory _inventory;
         public Sprite _spriteIcon;
-        
+        private PopUp _popUp;
+        private GameObject _popUpGameobject;
+        private List<Sprite> _popUpSprites;
         
 /// <summary>
 /// Abzeichennummern
@@ -50,6 +56,12 @@ namespace Scenes.Gameboard.Scripts
             
             foreach (var tempVar in tempAbzeichenArray)
             {
+                if (tempVar != 9)
+                {
+                    _popUpSprites.Add(_spriteList[tempVar]);
+                    
+                }
+                
                 if (_abzeichenList.Exists(objects => objects.GetAbzeichenNumber() == tempVar))
                 {
                     _abzeichenList.Find(objects => objects.GetAbzeichenNumber() == tempVar).SetAbzeichenCount(1);
@@ -62,40 +74,59 @@ namespace Scenes.Gameboard.Scripts
                     AbzeichenObjects abzeichenObjects = new AbzeichenObjects(tempVar,_spriteList[tempVar]);
                     _abzeichenList.Add(abzeichenObjects);
                 }
-                
-                
             }
-        
             
-        
-        
+            
         }
 
         public void AbzeichenTest()
         {
             Debug.Log("AbzeichenTest");
         }
-    
+        
+
         // Start is called before the first frame update
         void Start()
         {
+            _gameController = FindFirstObjectByType<GameController>();
+            _inventory = FindFirstObjectByType<Inventory>();
             _abzeichenList = new List<AbzeichenObjects>();
-            _inventory = FindObjectOfType<Inventory>();
-
-
+            _popUpSprites = new List<Sprite>();
+            
+            _popUpGameobject = _inventory._popUp;
+            _popUp = _popUpGameobject.GetComponentInChildren<PopUp>();
+            _popUpGameobject.SetActive(false);
+            
         }
 
-        public void showAbzeichen()
+        public void ShowAbzeichen()
         {
             _inventory.SetInventory(_abzeichenList);
             _inventory.SetPlayerIcon(_spriteIcon);
+            
         }
 
-        // Update is called once per frame
-        void Update()
+        public void ShowPopUp()
         {
-        
+            if (_popUp == null)
+            {
+                _popUp = _popUpGameobject.GetComponentInChildren<PopUp>();
+            }
+            
+            StartCoroutine(ShowingBadgesPopUp());
         }
+
+        IEnumerator ShowingBadgesPopUp()
+        {
+            _popUpGameobject.SetActive(true);
+            _popUp.showImagesforSprites(_popUpSprites);
+
+            yield return new WaitForSeconds(6);
+            
+            _popUpSprites.Clear();
+            _popUpGameobject.SetActive(false);
+        }
+        
     }
 }
 

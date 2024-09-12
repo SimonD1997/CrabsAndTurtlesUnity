@@ -3,9 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Security.Policy;
 using System.Xml.Linq;
+using Dreamteck;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem.HID;
+using UnityEngine.Serialization;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
+using Button = UnityEngine.UI.Button;
 using Random = UnityEngine.Random;
 
 namespace Scenes.Gameboard.Scripts
@@ -45,9 +50,11 @@ namespace Scenes.Gameboard.Scripts
         private int _correctAnswer;
         public bool inputFieldEnter = false;
         public TMP_InputField inputField;
-        public TextMeshProUGUI timerField;
+        public TextMeshProUGUI inputFieldPlaceholder;
+        public TextMeshProUGUI timerField; 
+        public TMP_Text confirmButtonText;
         public Button confirmButton;
-        private bool confirmButtonEnter = false;
+        public bool confirmButtonEnter = false;
         
         //private GameObject[] _cardStack;
         private List<GameObject> _cardList;
@@ -60,8 +67,15 @@ namespace Scenes.Gameboard.Scripts
         {
            // Debug.Log(this._cardStack.Length.ToString());
             this.gameIsRunning = true;
-            timerField.text = "0";
+            timerField.text = "";
             this.inputField.textComponent.enableWordWrapping = true;
+            inputFieldPlaceholder = inputField.placeholder.gameObject.GetComponent<TextMeshProUGUI>();
+            inputFieldPlaceholder.text = "";
+            inputField.interactable = false;
+            confirmButtonText.text = "";
+            confirmButton.interactable = false;
+            
+            
             
             //Starts the Game:
             playerTurn = Random.Range(0, 2);
@@ -70,8 +84,8 @@ namespace Scenes.Gameboard.Scripts
             lastMovementScript = movementScript;
             
             abzeichen = movementScript.gameObject.GetComponent<Abzeichen>();
-            abzeichen.showAbzeichen();
-
+            // Warum auch immer gibt es Nullpointer exeptions TODO. Herausfinden warum... 
+            //abzeichen.showAbzeichen();
         }
 
         private void Awake()
@@ -166,7 +180,7 @@ namespace Scenes.Gameboard.Scripts
             }
             this.movementScript = playerMovements[playerTurn];
             this.abzeichen = this.movementScript.gameObject.GetComponent<Abzeichen>();
-            this.abzeichen.showAbzeichen();
+            this.abzeichen.ShowAbzeichen();
         }
 
         public int GetPlayerTurn()
@@ -195,8 +209,6 @@ namespace Scenes.Gameboard.Scripts
             return this._diceNumber;
         }
         
-        
-        
         public void SetDiceNumber(int diceNumber)
         {
             
@@ -205,7 +217,7 @@ namespace Scenes.Gameboard.Scripts
             if ( _actionCardState == false)
             {
                 
-                timerField.text = "0";
+                timerField.text = "";
                 _corectionTimes = 1;
                 
                 this._diceNumber = diceNumber;
@@ -215,7 +227,7 @@ namespace Scenes.Gameboard.Scripts
                 lastMovementScript.SetCameraActiv(true);
                 this.movementScript.Movement(diceNumber);
                 
-                this.abzeichen.showAbzeichen();
+                this.abzeichen.ShowAbzeichen();
             
                 //Karten vom Stapel nehmen, wenn die Karte umgedreht ist.
 
@@ -254,10 +266,55 @@ namespace Scenes.Gameboard.Scripts
         
         IEnumerator WaiterAnimator(GameObject tempCard)
         {
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(0.5f);
             tempCard.GetComponent<CardFlipClick>().ClickStateActivate();
             yield return new WaitForSeconds(5);
             Destroy(tempCard);
+            
+        }
+
+        IEnumerator WaiterToEndOfMove()
+        {
+            
+            
+            Debug.Log("Waiter Am Ende" +confirmButtonEnter);
+            
+            bool secondPlayer = confirmButtonEnter == true;
+            Debug.Log("Secondplayer" + secondPlayer);
+            confirmButtonEnter = false;
+            confirmButtonText.text = "";
+            inputField.interactable = false;
+            inputFieldPlaceholder.text = "";
+            timerField.text = "";
+            
+            yield return new WaitForSeconds(3);
+
+            inputField.text = "";
+            timerField.text = "";
+            
+            if (secondPlayer == false)
+            {
+                confirmButton.interactable = true;
+                confirmButtonText.text = "Spielzug beenden";
+                
+                while (true)
+                {
+                    if (confirmButtonEnter)
+                    {
+                        confirmButtonText.text = "";
+                        confirmButton.interactable = false;
+                        
+                        NextPlayer();
+                    
+                        timerField.text = "";
+                        yield break;
+                    }
+                
+                    yield return null;
+                }
+                
+            }
+            
             
         }
 
@@ -314,8 +371,14 @@ namespace Scenes.Gameboard.Scripts
         {
             this.lastMovementScript = this.movementScript;
             
+            inputFieldPlaceholder.text = "Eingabefeld";
+            inputField.interactable = true;
             inputField.text = "";
             inputFieldEnter = false;
+            
+            confirmButton.interactable = true;
+            confirmButtonText.text = "Bestätigen";
+            
             _timer =  timer;
             _correctAnswer = correctAnswer;
             _timer.SetTimerText("Timer: ");
@@ -335,6 +398,10 @@ namespace Scenes.Gameboard.Scripts
             _newColourNumber = newColourNumber;
             _actionCardState = true;
             _abzeichenList = abzeichenList;
+            
+            confirmButton.interactable = true;
+            confirmButtonText.text = "Eingabe bestätigen";
+            
             StartCoroutine(Waiter3());
 
         }
@@ -351,8 +418,10 @@ namespace Scenes.Gameboard.Scripts
                 this.lastMovementScript.SetCameraActiv(false);
                 
                 
-                abzeichen.AddAbzeichen(_abzeichenList);
                 
+                abzeichen.AddAbzeichen(_abzeichenList);
+                abzeichen.ShowAbzeichen();
+                abzeichen.ShowPopUp();
                 
                 //flip Card after correct Answer
                 GameObject tempCard = this._riddleCardList[0].gameObject;
@@ -364,6 +433,9 @@ namespace Scenes.Gameboard.Scripts
                     AddCardStack(_riddleCardList,riddleCardPrefab,riddlePrefabStack,-100);
                 }
                 
+                StartCoroutine(WaiterToEndOfMove());
+                
+
             }
             else 
             {
@@ -371,6 +443,7 @@ namespace Scenes.Gameboard.Scripts
                 inputField.text = "Falsche Antwort";
                 if (firstTry)
                 {
+                    NextPlayer();
                     StartCoroutine(Waiter2());  
                 }
                 else
@@ -389,13 +462,14 @@ namespace Scenes.Gameboard.Scripts
                         MoveCardsUp(_riddleCardList);
                         AddCardStack(_riddleCardList,riddleCardPrefab,riddlePrefabStack,-100);
                     }
+                    
+                    StartCoroutine(WaiterToEndOfMove());
                 }
             }
 
             if (firstTry)
             {
-                NextPlayer();
-                
+                //NextPlayer();
             }
             
         }
@@ -409,11 +483,16 @@ namespace Scenes.Gameboard.Scripts
                 if (inputFieldEnter)
                 {
                     _timer.StopTimer();
+
+                    confirmButton.interactable = false;
+                    confirmButtonEnter = false;
                     CheckAnswer(true);
                     yield break;
                 } 
                 yield return null;
             }
+            confirmButton.interactable = false;
+            confirmButtonEnter = false;
             CheckAnswer(true);
         }
         /// <summary>
@@ -429,6 +508,7 @@ namespace Scenes.Gameboard.Scripts
             yield return new WaitForSeconds(5);
             
             inputField.text = "";
+            confirmButton.interactable = true;
             inputFieldEnter = false;
             _timer.SetTimerText("Timer: ");
             _timer.timeRemaining = 30;
@@ -441,16 +521,25 @@ namespace Scenes.Gameboard.Scripts
                 if (inputFieldEnter)
                 {
                     _timer.StopTimer();
+                    
+                    confirmButton.interactable = false;
+                    confirmButtonEnter = true;
                     CheckAnswer(false);
                     //important for update if player 2 gets the right answer
-                    abzeichen.showAbzeichen();
+                    abzeichen.ShowAbzeichen();
+                    abzeichen.ShowPopUp();
                     yield break;
                 } 
                 yield return null;
             }
+            
+            confirmButton.interactable = false;
+            confirmButtonEnter = true;
             CheckAnswer(false);
             //important for update if player 2 gets the right answer
-            abzeichen.showAbzeichen();
+            abzeichen.ShowAbzeichen();
+            abzeichen.ShowPopUp();
+            
         }
 
         IEnumerator Waiter3()
@@ -465,22 +554,29 @@ namespace Scenes.Gameboard.Scripts
                 {
                     variablenTafel.gameObject.SetActive(false);
 
+                    if (_newColourNumber == variablenTafel.GetVar(movementScript.GetPositionColour()))
+                    {
+                        inputField.text = "Richtige Antwort!"; 
+                    }
+                    
                     if (_corectionTimes == 1)
                     {
                         // AbzeichenTest 
                         abzeichen.AddAbzeichen(_abzeichenList);
-                        
+                        abzeichen.ShowAbzeichen();
+                        abzeichen.ShowPopUp();
                         
                     }
-                    
-                    
-                    NextPlayer();
                     this.lastMovementScript.SetCameraActiv(false);
+                    
+                    confirmButton.interactable = false;
+                    confirmButtonEnter = false;
+                    StartCoroutine(WaiterToEndOfMove());
                     
                     _actionCardState = false;
 
 
-                    timerField.text = "0";
+                    timerField.text = "";
                     _corectionTimes = 1;
 
                     //Karten vom Stapel nehmen, wenn die Karte umgedreht ist.
@@ -491,6 +587,7 @@ namespace Scenes.Gameboard.Scripts
                     MoveCardsUp(_cardList);
                     AddCardStack(_cardList, cardPrefab, cardPrefabStack, 0);
 
+                    
 
                     //sets colour in Variablentafel (-999 stands für player movement and no variable change)
                     if (_newColourNumber != -999)
@@ -499,6 +596,7 @@ namespace Scenes.Gameboard.Scripts
 
                     }
 
+                    
                     yield break;
 
                 }else if (confirmButtonEnter)
@@ -510,10 +608,15 @@ namespace Scenes.Gameboard.Scripts
                 }else if (_newColourNumber == -999 && nextMove == 0)
                 {
                     abzeichen.AddAbzeichen(_abzeichenList);
+                    abzeichen.ShowAbzeichen();
+                    abzeichen.ShowPopUp();
                     
+                    confirmButton.interactable = false;
+                    confirmButtonEnter = false;
+                    StartCoroutine(WaiterToEndOfMove());
                     
-                    NextPlayer();
                     this.lastMovementScript.SetCameraActiv(false);
+                    
                     
                     _actionCardState = false;
                     inputField.text = "";
@@ -527,6 +630,8 @@ namespace Scenes.Gameboard.Scripts
                     //Karten alle um eins nach oben verschieben und neue Karte unten anfügen
                     MoveCardsUp(_cardList);
                     AddCardStack(_cardList, cardPrefab, cardPrefabStack, 0);
+                    
+                    
                     
                     yield break;
                 }

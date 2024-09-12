@@ -10,6 +10,7 @@ namespace Scenes.Gameboard.Scripts
         public Image[] imageSlots;
         private AbzeichenObjects[] _abzeichenObjectsArray;
         public Image playerIcon;
+        public GameObject _popUp;
     
         // Start is called before the first frame update
         void Start()

@@ -10,6 +10,8 @@ public class ActionCard : MonoBehaviour
     private GameController _gameController;
     private SpriteRenderer _spriteRenderer;
     private VariablenTafel _variablenTafel;
+    private TextMeshProUGUI _inputField;
+    
     public string _cardName;
     public byte _elementeAnzahl;
     
@@ -30,6 +32,8 @@ public class ActionCard : MonoBehaviour
         _spriteRenderer = this.gameObject.GetComponentInChildren<SpriteRenderer>();
         _cardName = _spriteRenderer.sprite.name;
         _elementeAnzahl = Convert.ToByte(_cardName[0].ToString());
+
+        _inputField = _gameController.inputField.placeholder.gameObject.GetComponent<TextMeshProUGUI>();
     }
 
     // Update is called once per frame
@@ -44,6 +48,8 @@ public class ActionCard : MonoBehaviour
         switch (_elementeAnzahl)
         {
             case 1:
+                _inputField.text = "";
+                _gameController.inputField.interactable = false;
                 _gameController.variablenTafel.gameObject.SetActive(true);
                 elementWert = Convert.ToInt32(_cardName[1..3]);
                 if (_cardName[3].ToString() == "+")
@@ -62,8 +68,8 @@ public class ActionCard : MonoBehaviour
                 // Range first included position to last not included position
                 int turtle = Convert.ToInt32(_cardName[1..3]);
                 int crab = Convert.ToInt32(_cardName[4..6]);
-                _gameController.inputField.placeholder.gameObject.GetComponent<TextMeshProUGUI>().text =
-                    "Wie viel darf deine Figur laufen?";
+                _inputField.text = "Wie viel darf deine Figur laufen?";
+                _gameController.inputField.interactable = true;
                 if (_gameController.GetPlayerTurn() == 0)
                 {
                     _gameController.SetNextMove(crab);
@@ -79,6 +85,9 @@ public class ActionCard : MonoBehaviour
                  
                 break;
             case 3:
+                _inputField.text = "";
+                _gameController.inputField.interactable = false;
+                
                 _abzeichen.Add(3);
                 _gameController.variablenTafel.gameObject.SetActive(true);
                 int positionColour = this._variablenTafel.GetVar(_gameController.movementScript.GetPositionColour());
