@@ -39,6 +39,8 @@ namespace Scenes.Gameboard.Scripts
         public Abzeichen abzeichen;
         public VariablenTafel variablenTafel;
 
+        public Inventory inventory;
+
         public List<MovementScript> playerMovements;
         
         public GameObject cardPrefab;
@@ -75,7 +77,7 @@ namespace Scenes.Gameboard.Scripts
             confirmButtonText.text = "";
             confirmButton.interactable = false;
             
-            
+            variablenTafel.SwitchGameobjectState(false);
             
             //Starts the Game:
             playerTurn = Random.Range(0, 2);
@@ -85,7 +87,7 @@ namespace Scenes.Gameboard.Scripts
             
             abzeichen = movementScript.gameObject.GetComponent<Abzeichen>();
             // Warum auch immer gibt es Nullpointer exeptions TODO. Herausfinden warum... 
-            //abzeichen.showAbzeichen();
+            abzeichen.ShowAbzeichen();
         }
 
         private void Awake()
@@ -376,6 +378,8 @@ namespace Scenes.Gameboard.Scripts
             inputField.text = "";
             inputFieldEnter = false;
             
+            variablenTafel.SwitchInputFields(false);
+            
             confirmButton.interactable = true;
             confirmButtonText.text = "Bestätigen";
             
@@ -395,9 +399,12 @@ namespace Scenes.Gameboard.Scripts
         public void ActionCard(int newColourNumber,List<int> abzeichenList)
         {
             inputFieldEnter = false;
+            //inputFieldPlaceholder.text = ""; set in class ActionCard
             _newColourNumber = newColourNumber;
             _actionCardState = true;
             _abzeichenList = abzeichenList;
+            
+            variablenTafel.SwitchInputFields(true);
             
             confirmButton.interactable = true;
             confirmButtonText.text = "Eingabe bestätigen";
@@ -414,10 +421,9 @@ namespace Scenes.Gameboard.Scripts
                 Debug.Log("correct Answer");
                 inputField.text = "Richtige Antwort";
                 
-                variablenTafel.gameObject.SetActive(false);
+                variablenTafel.SwitchGameobjectState(false);
                 this.lastMovementScript.SetCameraActiv(false);
-                
-                
+                variablenTafel.SwitchInputFields(false);
                 
                 abzeichen.AddAbzeichen(_abzeichenList);
                 abzeichen.ShowAbzeichen();
@@ -449,8 +455,8 @@ namespace Scenes.Gameboard.Scripts
                 else
                 {
                     
-                    
-                    variablenTafel.gameObject.SetActive(false);
+                    variablenTafel.SwitchInputFields(false);
+                    variablenTafel.SwitchGameobjectState(false);
                     this.lastMovementScript.SetCameraActiv(false);
                     
                     //flip Card after last Try
@@ -552,7 +558,7 @@ namespace Scenes.Gameboard.Scripts
                 if ((_newColourNumber == variablenTafel.GetVar(movementScript.GetPositionColour()) ||
                      _corectionTimes == 0) && confirmButtonEnter)
                 {
-                    variablenTafel.gameObject.SetActive(false);
+                    variablenTafel.SwitchGameobjectState(false);
 
                     if (_newColourNumber == variablenTafel.GetVar(movementScript.GetPositionColour()))
                     {
@@ -607,9 +613,8 @@ namespace Scenes.Gameboard.Scripts
                     confirmButtonEnter = false;
                 }else if (_newColourNumber == -999 && nextMove == 0)
                 {
-                    abzeichen.AddAbzeichen(_abzeichenList);
-                    abzeichen.ShowAbzeichen();
-                    abzeichen.ShowPopUp();
+                    //abzeichen.AddAbzeichen(_abzeichenList);
+                    //abzeichen.ShowAbzeichen();
                     
                     confirmButton.interactable = false;
                     confirmButtonEnter = false;
@@ -620,8 +625,7 @@ namespace Scenes.Gameboard.Scripts
                     
                     _actionCardState = false;
                     inputField.text = "";
-                    inputField.placeholder.gameObject.GetComponent<TextMeshProUGUI>().text =
-                        "Eingabefeld";
+                    inputFieldPlaceholder.text = "";
                     
                     //Karten vom Stapel nehmen, wenn die Karte umgedreht ist.
                     GameObject tempCard = this._cardList[0].gameObject;

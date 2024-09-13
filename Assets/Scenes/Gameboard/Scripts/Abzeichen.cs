@@ -12,7 +12,7 @@ namespace Scenes.Gameboard.Scripts
         public List<AbzeichenObjects> _abzeichenList;
         public Sprite[] _spriteList;
         private Inventory _inventory;
-        public Sprite _spriteIcon;
+        public Sprite spriteIcon;
         private PopUp _popUp;
         private GameObject _popUpGameobject;
         private List<Sprite> _popUpSprites;
@@ -83,13 +83,18 @@ namespace Scenes.Gameboard.Scripts
         {
             Debug.Log("AbzeichenTest");
         }
-        
+
+        void Awake()
+        {
+            _inventory = FindFirstObjectByType<Inventory>();
+        }
+
 
         // Start is called before the first frame update
         void Start()
         {
             _gameController = FindFirstObjectByType<GameController>();
-            _inventory = FindFirstObjectByType<Inventory>();
+            //_inventory = FindFirstObjectByType<Inventory>();
             _abzeichenList = new List<AbzeichenObjects>();
             _popUpSprites = new List<Sprite>();
             
@@ -102,7 +107,7 @@ namespace Scenes.Gameboard.Scripts
         public void ShowAbzeichen()
         {
             _inventory.SetInventory(_abzeichenList);
-            _inventory.SetPlayerIcon(_spriteIcon);
+            _inventory.SetPlayerIcon(this.spriteIcon);
             
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Mime;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -22,6 +23,18 @@ namespace Scenes.Gameboard.Scripts
         public GameObject blauGameObject;
         public GameObject gelbGameObject;
         public GameObject logTextField;
+        public Animator button;
+
+        private TMP_InputField _greenTextField;
+        private TMP_InputField _redTextField;
+        private TMP_InputField _yellowTextField;
+        private TMP_InputField _blueTextField;
+
+        private TextMeshProUGUI _greenPlaceholder;
+        private TextMeshProUGUI _redPlaceholder;
+        private TextMeshProUGUI _yellowPlaceholder;
+        private TextMeshProUGUI _bluePlaceholder;
+        
         
         
         // Start is called before the first frame update
@@ -33,17 +46,73 @@ namespace Scenes.Gameboard.Scripts
             _gelbVarList = new List<int>();
 
             //_gruen[0] = 
-
         }
 
-        public void switchGameobjectState()
+        private void Awake()
+        {
+            _greenTextField = gruenGameObject.GetComponentInChildren<TMP_InputField>();
+            _redTextField = rotGameObject.GetComponentInChildren<TMP_InputField>();
+            _yellowTextField = gelbGameObject.GetComponentInChildren<TMP_InputField>();
+            _blueTextField = blauGameObject.GetComponentInChildren<TMP_InputField>();
+
+            _greenPlaceholder = _greenTextField.placeholder.gameObject.GetComponent<TextMeshProUGUI>();
+            _redPlaceholder = _redTextField.placeholder.gameObject.GetComponent<TextMeshProUGUI>();
+            _yellowPlaceholder = _yellowTextField.placeholder.gameObject.GetComponent<TextMeshProUGUI>();
+            _bluePlaceholder = _blueTextField.placeholder.gameObject.GetComponent<TextMeshProUGUI>();
+        }
+
+        public void SwitchInputFields(bool inputFieldsActive)
+        {
+            if (inputFieldsActive)
+            {
+                _greenTextField.interactable = true;
+                _redTextField.interactable = true;
+                _blueTextField.interactable = true;
+                _yellowTextField.interactable = true;
+
+                _greenPlaceholder.text = "Eingabefeld";
+                _redPlaceholder.text = "Eingabefeld";
+                _bluePlaceholder.text = "Eingabefeld";
+                _yellowPlaceholder.text = "Eingabefeld";
+            }
+            else
+            {
+                _greenTextField.interactable = false;
+                _redTextField.interactable = false;
+                _blueTextField.interactable = false;
+                _yellowTextField.interactable = false;
+                
+                _greenPlaceholder.text = "";
+                _redPlaceholder.text = "";
+                _bluePlaceholder.text = "";
+                _yellowPlaceholder.text = "";
+            }
+        }
+
+        public void SwitchGameobjectState(bool active)
+        {
+            if (active)
+            {
+                button.SetBool("Active",true);
+                this.gameObject.SetActive(true);
+            }
+            else
+            {
+                button.SetBool("Active",false);
+                this.gameObject.SetActive(false);
+            }
+        }
+        
+        public void SwitchGameobjectState()
         {
             if (this.gameObject.activeSelf)
             {
+                button.SetBool("Active",false);
                 this.gameObject.SetActive(false);
             }
             else
             {
+                button.SetBool("Active",true);
                 this.gameObject.SetActive(true);
             }
         }

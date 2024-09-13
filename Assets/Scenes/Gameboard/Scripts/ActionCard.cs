@@ -50,7 +50,7 @@ public class ActionCard : MonoBehaviour
             case 1:
                 _inputField.text = "";
                 _gameController.inputField.interactable = false;
-                _gameController.variablenTafel.gameObject.SetActive(true);
+                _gameController.variablenTafel.SwitchGameobjectState(true);
                 elementWert = Convert.ToInt32(_cardName[1..3]);
                 if (_cardName[3].ToString() == "+")
                 {
@@ -89,7 +89,7 @@ public class ActionCard : MonoBehaviour
                 _gameController.inputField.interactable = false;
                 
                 _abzeichen.Add(3);
-                _gameController.variablenTafel.gameObject.SetActive(true);
+                _gameController.variablenTafel.SwitchGameobjectState(true);
                 int positionColour = this._variablenTafel.GetVar(_gameController.movementScript.GetPositionColour());
                 if (_cardName[3].ToString() == "g")
                 {
@@ -153,6 +153,7 @@ public class ActionCard : MonoBehaviour
     {
         CollectAnswer();
         _gameController.ActionCard(_colourVariablesNew,_abzeichen);
+        
         // doch direkt oben verwendet, da nicht bei allen Karten die Variablentafel gebraucht wird...
         //_gameController.variablenTafel.gameObject.SetActive(true);
     }
