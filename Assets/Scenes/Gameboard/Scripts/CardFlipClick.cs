@@ -27,7 +27,11 @@ public class CardFlipClick : MonoBehaviour
         Debug.Log ("CLICKED ");
         //this.gameObject.GetComponent<Animator>().enabled = false;
     }
-
+/// <summary>
+/// Check if the card is clicked, then turn the card
+/// and start the riddle or the action of the card
+/// </summary>
+/// <param name="hit"></param>
     void ScreenHit(RaycastHit hit)
     {
         if (hit.collider == _collider)
