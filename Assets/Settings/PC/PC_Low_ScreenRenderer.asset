@@ -84,7 +84,8 @@ MonoBehaviour:
   - {fileID: 8597830380581107856}
   - {fileID: -1138028507582284805}
   - {fileID: -2828792358486935836}
-  m_RendererFeatureMap: 903899892da15177fb3b4a151ae934f0e4f60b69561cbed8
+  - {fileID: 568484866687493232}
+  m_RendererFeatureMap: 903899892da15177fb3b4a151ae934f0e4f60b69561cbed870e4176bf9a9e307
   m_UseNativeRenderPass: 0
   postProcessData: {fileID: 11400000, guid: 41439944d30ece34e96484bdb6645b55, type: 2}
   xrSystemData: {fileID: 11400000, guid: 60e1133243b97e347b653163a8c01b64, type: 2}
@@ -123,6 +124,19 @@ MonoBehaviour:
   m_CopyDepthMode: 1
   m_AccurateGbufferNormals: 0
   m_IntermediateTextureMode: 0
+--- !u!114 &568484866687493232
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4a67bf8a30b9b6d49a3b2fa63d95e9b0, type: 3}
+  m_Name: EffekseerURPRenderPassFeature
+  m_EditorClassIdentifier: 
+  m_Active: 1
 --- !u!114 &8597830380581107856
 MonoBehaviour:
   m_ObjectHideFlags: 0

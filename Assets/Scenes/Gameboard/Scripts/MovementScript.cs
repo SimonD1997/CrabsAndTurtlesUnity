@@ -157,10 +157,10 @@ public class MovementScript : MonoBehaviour
         
     }
 
-/// <summary>
-/// Lässt das Objekt an einem gegeben Spline entlanglaufen.
-/// </summary>
-/// <param name="steps"> legt fest wie viele Blöcke nach vorne oder zurückgelaufen werden messen</param>
+    /// <summary>
+    /// Lässt das Objekt an einem gegeben Spline entlanglaufen.
+    /// </summary>
+    /// <param name="steps"> legt fest wie viele Blöcke nach vorne oder zurückgelaufen werden messen</param>
     public void Movement(int steps)
     {
         // falls über oder unter die Arraygrenze kommt, schauen wie in den Regeln behandelt werden soll;
@@ -168,14 +168,15 @@ public class MovementScript : MonoBehaviour
 
         if (steps > 0)
         {
-            
+
             _splineUser.SetClipRange(_felder[aktuellePosition], _felder[aktuellePosition + steps]);
             _splineFollower.Restart();
             _splineFollower.Rebuild();
             aktuellePosition = aktuellePosition + steps;
             _positionColour = _felderColour[aktuellePosition];
 
-        }else if (steps < 0)
+        }
+        else if (steps < 0)
         {
             _splineUser.SetClipRange(_felder[aktuellePosition], _felder[aktuellePosition + steps]);
             _splineFollower.Restart();
@@ -184,9 +185,15 @@ public class MovementScript : MonoBehaviour
             aktuellePosition = aktuellePosition + steps;
 
         }
-        
-        _anim.SetBool("Walk",true);
-        
+
+        _anim.SetBool("Walk", true);
+
+        if (aktuellePosition + steps > _felder.Length)
+        {
+            //EndOfGame();
+            
+
+        }
 
     }
 

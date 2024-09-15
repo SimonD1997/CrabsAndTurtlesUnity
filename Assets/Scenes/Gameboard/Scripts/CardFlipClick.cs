@@ -2,8 +2,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
-using UnityEngine;
-using System.Collections;
 using TouchPhase = UnityEngine.TouchPhase;
 
 

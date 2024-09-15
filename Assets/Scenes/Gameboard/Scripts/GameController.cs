@@ -65,7 +65,7 @@ namespace Scenes.Gameboard.Scripts
         public TextMeshProUGUI scoreboardText;
         private int startingPlayer;
 
-        private EndGameHandler _endGameHandler;
+    
     
         // Start is called before the first frame update
         void Start()
@@ -243,6 +243,7 @@ namespace Scenes.Gameboard.Scripts
         public void ConfirmButtonClick()
         {
             confirmButtonEnter = true;
+            inputFieldEnter = true;
         }
 
         public void SetNextMove(int setNextMove)
