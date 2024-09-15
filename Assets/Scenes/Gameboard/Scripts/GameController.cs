@@ -18,10 +18,6 @@ namespace Scenes.Gameboard.Scripts
     {
         private int _diceNumber;
         
-        
-        //Todo:
-        //Rundenbasierte Spielmechanik einführen 
-        
         private bool gameIsRunning = false;
         private int playerTurn = 0;
         private int nextMove;
@@ -46,6 +42,8 @@ namespace Scenes.Gameboard.Scripts
         public GameObject riddleCardPrefab;
         public Sprite[] cardPrefabStack;
         public Sprite[] riddlePrefabStack;
+        
+        public Camera m_camera;
 
         private Timer _timer;
         private int _correctAnswer;
@@ -88,9 +86,20 @@ namespace Scenes.Gameboard.Scripts
             // Warum auch immer gibt es Nullpointer exeptions TODO. Herausfinden warum... 
             abzeichen.ShowAbzeichen();
         }
-
+        /// <summary>
+        /// Sets the horizontal field of view for the camera.
+        /// </summary>
+        /// <param name="horizontalFOV">The desired horizontal field of view in degrees.</param>
+        private void SetHorizontalFieldOfView(float horizontalFOV)
+        {
+            float verticalFOV = 2 * Mathf.Atan(Mathf.Tan(horizontalFOV * Mathf.Deg2Rad / 2) / m_camera.aspect) * Mathf.Rad2Deg;
+            m_camera.fieldOfView = verticalFOV;
+        }
+        
         private void Awake()
         {
+            SetHorizontalFieldOfView(90);
+            
             _cardList = new List<GameObject>();
             _riddleCardList = new List<GameObject>();
             _abzeichenList = new List<int>();
@@ -160,9 +169,9 @@ namespace Scenes.Gameboard.Scripts
             // einen virtuellen Zug machen falls gegen den Computer gekämpft wird
         
         }
-/// <summary>
-/// stets round for new player, checks max player and starts again at player 0
-/// </summary>
+         /// <summary>
+        /// sets the round for new player, checks max player and starts again at player 0
+        /// </summary>
         void NextPlayer()
         {
             // sonst wird beim zweiten player/versuch die abzeichen nicht angefügt...
@@ -183,7 +192,10 @@ namespace Scenes.Gameboard.Scripts
             this.abzeichen = this.movementScript.gameObject.GetComponent<Abzeichen>();
             this.abzeichen.ShowAbzeichen();
         }
-
+        /// <summary>
+        /// Gets the current player's turn.
+        /// </summary>
+        /// <returns>The current player's turn.</returns>
         public int GetPlayerTurn()
         {
             return this.playerTurn;
@@ -203,13 +215,20 @@ namespace Scenes.Gameboard.Scripts
         {
             nextMove = setNextMove;
         }
-        
+        /// <summary>
+        /// Gets the dice number.
+        /// </summary>
+        /// <returns>The dice number.</returns>
         public int GetDiceNumber()
         {
-            Debug.Log("DiceNumber:"+ this._diceNumber);
             return this._diceNumber;
         }
         
+        // <summary>
+        /// Sets the dice number. And starts the movement of the player.
+        /// Also flips cards if they are turned and removes them from the stack.
+        /// </summary>
+        /// <param name="diceNumber">The dice number to set.</param>
         public void SetDiceNumber(int diceNumber)
         {
             
@@ -264,7 +283,11 @@ namespace Scenes.Gameboard.Scripts
             }
             
         }
-        
+        /// <summary>
+        /// Coroutine to animate the card flip and destroy the card after a delay.
+        /// </summary>
+        /// <param name="tempCard">The card to animate and destroy.</param>
+        /// <returns>An IEnumerator for the coroutine.</returns>
         IEnumerator WaiterAnimator(GameObject tempCard)
         {
             yield return new WaitForSeconds(0.5f);
@@ -273,15 +296,15 @@ namespace Scenes.Gameboard.Scripts
             Destroy(tempCard);
             
         }
-
+        /// <summary>
+        /// Coroutine to handle the end of a move.
+        /// </summary>
+        /// <returns>An IEnumerator for the coroutine.</returns>
         IEnumerator WaiterToEndOfMove()
         {
             
             
-            Debug.Log("Waiter Am Ende" +confirmButtonEnter);
-            
             bool secondPlayer = confirmButtonEnter == true;
-            Debug.Log("Secondplayer" + secondPlayer);
             confirmButtonEnter = false;
             confirmButtonText.text = "";
             inputField.interactable = false;
@@ -318,7 +341,9 @@ namespace Scenes.Gameboard.Scripts
             
             
         }
-
+        /// <summary>
+        /// Initializes the card stack.
+        /// </summary>
         private void CardStack()
         {
             
@@ -345,7 +370,10 @@ namespace Scenes.Gameboard.Scripts
             _cardList[0].gameObject.GetComponent<CardFlipClick>().enabled = true;
             //_cardList[0].gameObject.GetComponent<Animator>().enabled = true;
         }
-
+        /// <summary>
+        /// Moves the cards up in the stack.
+        /// </summary>
+        /// <param name="cardList">The list of cards to move up.</param>
         private void MoveCardsUp(List<GameObject> cardList)
         {
             foreach (var o in cardList)
@@ -359,7 +387,13 @@ namespace Scenes.Gameboard.Scripts
             cardList[0].gameObject.GetComponent<CardFlipClick>().enabled = true;
             
         }
-
+        /// <summary>
+        /// Adds a card to the stack.
+        /// </summary>
+        /// <param name="cardList">The list of cards to add to.</param>
+        /// <param name="prefab">The card prefab to instantiate.</param>
+        /// <param name="spriteStack">The array of sprites to choose from.</param>
+        /// <param name="yPosition">The y position to place the card at.</param>
         private void AddCardStack(List<GameObject> cardList, GameObject prefab, Sprite[] spriteStack,int yPosition)
         {
             GameObject tempCard = Instantiate(prefab, new Vector3(-40, yPosition, 4), riddleCardPrefab.transform.rotation);
