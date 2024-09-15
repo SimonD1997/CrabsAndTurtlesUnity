@@ -218,5 +218,9 @@ public class MovementScript : MonoBehaviour
         _anim.SetBool("Walk",false);
         
     }
-    
+
+    public int GetScore()
+    {
+        throw new NotImplementedException();
+    }
 }

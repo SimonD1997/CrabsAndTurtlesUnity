@@ -60,6 +60,12 @@ namespace Scenes.Gameboard.Scripts
         private List<GameObject> _riddleCardList;
         private List<int> _abzeichenList;
     
+        //Endgame
+        public GameObject scoreboardUI;
+        public TextMeshProUGUI scoreboardText;
+        private int startingPlayer;
+
+        private EndGameHandler _endGameHandler;
     
         // Start is called before the first frame update
         void Start()
@@ -78,6 +84,7 @@ namespace Scenes.Gameboard.Scripts
             
             //Starts the Game:
             playerTurn = Random.Range(0, 2);
+            startingPlayer = playerTurn;
             
             movementScript = playerMovements[playerTurn];
             lastMovementScript = movementScript;
@@ -205,6 +212,33 @@ namespace Scenes.Gameboard.Scripts
         {
             inputFieldEnter = true;
         }
+        
+        /// <summary>
+        /// Ends the game and displays the scoreboard with final scores.
+        /// </summary>
+        public void EndGame()
+        {
+            // Check if the player who ended the game is not the starting player
+            if (playerTurn != startingPlayer)
+            {
+                // Allow the second player to make one more move
+                NextPlayer();
+                Debug.Log("Second player gets one more move.");
+            }
+            gameIsRunning = false;
+
+            // Calculate final scores (example logic)
+            int player1Score = playerMovements[0].GetScore();
+            int player2Score = playerMovements[1].GetScore();
+
+            // Display the scoreboard
+            scoreboardUI.SetActive(true);
+            scoreboardText.text = $"Final Scores:\nPlayer 1: {player1Score}\nPlayer 2: {player2Score}";
+
+            Debug.Log("Game ended. Final scores displayed.");
+            
+        }
+
 
         public void ConfirmButtonClick()
         {
@@ -564,9 +598,8 @@ namespace Scenes.Gameboard.Scripts
                     confirmButton.interactable = false;
                     confirmButtonEnter = true;
                     CheckAnswer(false);
-                    //important for update if player 2 gets the right answer
-                    abzeichen.ShowAbzeichen();
-                    abzeichen.ShowPopUp();
+                    //important for update if player 2 gets the right answer ?? Eigentlich nicht... da ja in CheckAnswer
+                    //abzeichen.ShowAbzeichen();
                     yield break;
                 } 
                 yield return null;
@@ -576,8 +609,7 @@ namespace Scenes.Gameboard.Scripts
             confirmButtonEnter = true;
             CheckAnswer(false);
             //important for update if player 2 gets the right answer
-            abzeichen.ShowAbzeichen();
-            abzeichen.ShowPopUp();
+            //abzeichen.ShowAbzeichen();
             
         }
 
