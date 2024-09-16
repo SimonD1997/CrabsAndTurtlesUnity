@@ -128,29 +128,56 @@ namespace Scenes.Gameboard.Scripts
         
         public void Gruen()
         {
-            _aktuelleVarGruen = Convert.ToInt32(gruenGameObject.GetComponentInChildren<TMP_InputField>().text);
+            string input = gruenGameObject.GetComponentInChildren<TMP_InputField>().text;
+            if (string.IsNullOrEmpty(input))
+            {
+                Debug.LogError("Input for Gruen is empty!");
+                return;
+            }
+
+            _aktuelleVarGruen = Convert.ToInt32(input);
             addToList();
             gruenGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarGruen.ToString();
-            //eingabe erfolgreich und an den Gamecontroller zurückgeben...
         }
-        
+
         public void Rot()
         {
-            _aktuelleVarRot = Convert.ToInt32(rotGameObject.GetComponentInChildren<TMP_InputField>().text);
+            string input = rotGameObject.GetComponentInChildren<TMP_InputField>().text;
+            if (string.IsNullOrEmpty(input))
+            {
+                Debug.LogError("Input for Rot is empty!");
+                return;
+            }
+
+            _aktuelleVarRot = Convert.ToInt32(input);
             addToList();
             rotGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarRot.ToString();
         }
-        
+
         public void Blau()
         {
-            _aktuelleVarBlau = Convert.ToInt32(blauGameObject.GetComponentInChildren<TMP_InputField>().text);
+            string input = blauGameObject.GetComponentInChildren<TMP_InputField>().text;
+            if (string.IsNullOrEmpty(input))
+            {
+                Debug.LogError("Input for Blau is empty!");
+                return;
+            }
+
+            _aktuelleVarBlau = Convert.ToInt32(input);
             addToList();
             blauGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarBlau.ToString();
         }
-        
+
         public void Gelb()
         {
-            _aktuelleVarGelb = Convert.ToInt32(gelbGameObject.GetComponentInChildren<TMP_InputField>().text);
+            string input = gelbGameObject.GetComponentInChildren<TMP_InputField>().text;
+            if (string.IsNullOrEmpty(input))
+            {
+                Debug.LogError("Input for Gelb is empty!");
+                return;
+            }
+
+            _aktuelleVarGelb = Convert.ToInt32(input);
             addToList();
             gelbGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarGelb.ToString();
         }
