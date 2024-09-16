@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Xml.Linq;
 using Dreamteck;
+using DTT.Rankings.Runtime;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem.HID;
@@ -10,7 +11,10 @@ using UnityEngine.Serialization;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 using Button = UnityEngine.UI.Button;
+using Image = UnityEngine.UIElements.Image;
 using Random = UnityEngine.Random;
+
+
 
 namespace Scenes.Gameboard.Scripts
 {
@@ -34,7 +38,7 @@ namespace Scenes.Gameboard.Scripts
         public Abzeichen abzeichen;
         public VariablenTafel variablenTafel;
 
-        public Inventory inventory;
+        public GameObject inventory;
 
         public List<MovementScript> playerMovements;
         
@@ -64,9 +68,10 @@ namespace Scenes.Gameboard.Scripts
         public GameObject scoreboardUI;
         public TextMeshProUGUI scoreboardText;
         private int startingPlayer;
+        private bool endOfGame;
+        public LeaderboardUI _leaderboardUI;
 
-    
-    
+
         // Start is called before the first frame update
         void Start()
         {
@@ -165,6 +170,10 @@ namespace Scenes.Gameboard.Scripts
             {
                 //todo:
                 //run endscreen with scoreboard
+              
+                this.movementScript.SetCameraActiv(false);
+                this.inventory.gameObject.SetActive(false);
+                
             }
         }
 
@@ -181,6 +190,12 @@ namespace Scenes.Gameboard.Scripts
         /// </summary>
         void NextPlayer()
         {
+            if (endOfGame)
+            {
+                EndGame();
+                return;
+            }
+            
             // sonst wird beim zweiten player/versuch die abzeichen nicht angefügt...
             //_abzeichenList.Clear();
 
@@ -216,26 +231,80 @@ namespace Scenes.Gameboard.Scripts
         /// <summary>
         /// Ends the game and displays the scoreboard with final scores.
         /// </summary>
-        public void EndGame()
+        private void EndGame()
         {
+            
+            MovementScript winner = null;
+            
             // Check if the player who ended the game is not the starting player
             if (playerTurn != startingPlayer)
             {
                 // Allow the second player to make one more move
                 NextPlayer();
                 Debug.Log("Second player gets one more move.");
+                
+                endOfGame = true;
             }
-            gameIsRunning = false;
+            else
+            {
+                this.gameIsRunning = false;
+                
+                this.yourTurnField.gameObject.SetActive(false);
+                this.movementScript.SetCameraActiv(false);
+                this.abzeichen.gameObject.SetActive(false);
+                
+                // Calculate final scores (example logic)
+                int player1Score = playerMovements[0].GetScore();
+                int player2Score = playerMovements[1].GetScore();
+                Rank rank1 = new Rank(1, "CRAB", player1Score);
+                Rank rank2 = new Rank(2, "TURTLE", player2Score);
+                Rank[] rows = { rank1, rank2 };
+                
+                
+                if (playerMovements[0].GetEndOfGame() && playerMovements[1].GetEndOfGame())
+                {
+                    if (player1Score > player2Score)
+                    {
+                        winner = playerMovements[0];
+                    }
+                    else if (player2Score > player1Score)
+                    {
+                        winner = playerMovements[1];
+                    }else if (player1Score == player2Score)
+                    {
+                        // Both players have the same score
+                        Debug.Log("Both players have the same score.");
+                    }
+                    
+                    // Both players have reached the end of the game
+                    Debug.Log("Both players have reached the end of the game.");
+                }
+                else if (playerMovements[0].GetEndOfGame())
+                {
+                    winner = playerMovements[0];
+                }
+                else if (playerMovements[1].GetEndOfGame())
+                {
+                    winner = playerMovements[1];
+                }
+                
 
-            // Calculate final scores (example logic)
-            int player1Score = playerMovements[0].GetScore();
-            int player2Score = playerMovements[1].GetScore();
+                // Display the scoreboard
+                scoreboardUI.SetActive(true);
+                _leaderboardUI.AddRank(rows);
+                //scoreboardText.text = $"Final Scores:\nPlayer 1: {player1Score}\nPlayer 2: {player2Score}";
+                if (winner != null)
+                {
+                    scoreboardText.text =winner.gameObject.name + " hat gewonnen!";
+                }else
+                {
+                    scoreboardText.text = "Unentschieden!";
+                }
+               
 
-            // Display the scoreboard
-            scoreboardUI.SetActive(true);
-            scoreboardText.text = $"Final Scores:\nPlayer 1: {player1Score}\nPlayer 2: {player2Score}";
-
-            Debug.Log("Game ended. Final scores displayed.");
+                Debug.Log("Game ended. Final scores displayed.");
+            }
+            
             
         }
 
@@ -281,6 +350,11 @@ namespace Scenes.Gameboard.Scripts
                 lastMovementScript = movementScript;
                 lastMovementScript.SetCameraActiv(true);
                 this.movementScript.Movement(diceNumber);
+
+                if (movementScript.GetEndOfGame())
+                {
+                    EndGame();
+                }
                 
                 this.abzeichen.ShowAbzeichen();
             

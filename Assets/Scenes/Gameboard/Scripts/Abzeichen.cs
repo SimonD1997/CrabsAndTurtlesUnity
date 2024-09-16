@@ -8,8 +8,8 @@ namespace Scenes.Gameboard.Scripts
     public class Abzeichen : MonoBehaviour
     {
         private GameController _gameController;
-        
-        public List<AbzeichenObjects> _abzeichenList;
+
+        private List<AbzeichenObjects> _abzeichenList;
         public Sprite[] _spriteList;
         private Inventory _inventory;
         public Sprite spriteIcon;
@@ -87,6 +87,8 @@ namespace Scenes.Gameboard.Scripts
         void Awake()
         {
             _inventory = FindFirstObjectByType<Inventory>();
+            _abzeichenList = new List<AbzeichenObjects>();
+            _popUpSprites = new List<Sprite>();
         }
 
 
@@ -95,8 +97,6 @@ namespace Scenes.Gameboard.Scripts
         {
             _gameController = FindFirstObjectByType<GameController>();
             //_inventory = FindFirstObjectByType<Inventory>();
-            _abzeichenList = new List<AbzeichenObjects>();
-            _popUpSprites = new List<Sprite>();
             
             _popUpGameobject = _inventory._popUp;
             _popUp = _popUpGameobject.GetComponentInChildren<PopUp>();
@@ -130,6 +130,12 @@ namespace Scenes.Gameboard.Scripts
             
             _popUpSprites.Clear();
             _popUpGameobject.SetActive(false);
+        }
+        
+        public int GetScore()
+        {
+            return 999;
+            throw new NotImplementedException();
         }
         
     }

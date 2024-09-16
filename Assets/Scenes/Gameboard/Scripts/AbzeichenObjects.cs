@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Scenes.Gameboard.Scripts
 {
-    public class AbzeichenObjects : ScriptableObject
+    public class AbzeichenObjects
     {
         private int _abzeichenNumber;
         public Sprite[] _spriteList;

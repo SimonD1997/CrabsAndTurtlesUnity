@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Dreamteck.Splines;
+using Scenes.Gameboard.Scripts;
 using TMPro;
 using UnityEngine;
 
@@ -14,12 +15,16 @@ public class MovementScript : MonoBehaviour
     private Animator _anim;
     private Camera _camera;
     
+    private Abzeichen _badges;
+    
     /// <summary>
     /// gerade positionen sind rästelkarten und ungerade sind ereigniskarten
     /// </summary>
     private byte _positionCard;
     
     private int _positionColour; 
+    
+    private bool _endOfGame = false;
     
     
     // Array für distanzen der einzelnen Felder
@@ -115,8 +120,8 @@ public class MovementScript : MonoBehaviour
         2,
         4,
     };
-    
-    
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -127,6 +132,8 @@ public class MovementScript : MonoBehaviour
 
         _anim = _splineUser.gameObject.GetComponent<Animator>();
         _camera = this.gameObject.GetComponentInChildren<Camera>();
+        
+        aktuellePosition = 0;
 
         //setzt die Richtungsparameter bzw. lässt den start manuell auswählen
         //_splineFollower.autoStartPosition = false;
@@ -139,7 +146,7 @@ public class MovementScript : MonoBehaviour
 
         //TODO noch Möglichkeit suchen den Abstand der Knoten vom Startpunkt auszulesen...!!!
 
-
+        _badges = this.gameObject.GetComponent<Abzeichen>();
 
     }
 
@@ -148,14 +155,7 @@ public class MovementScript : MonoBehaviour
         _camera.enabled = activ;
         //_canvas.SetActive(activ);
     } 
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-        
-        
-    }
+    
 
     /// <summary>
     /// Lässt das Objekt an einem gegeben Spline entlanglaufen.
@@ -165,7 +165,18 @@ public class MovementScript : MonoBehaviour
     {
         // falls über oder unter die Arraygrenze kommt, schauen wie in den Regeln behandelt werden soll;
         // ob man direkt treffen muss oder solange weitergeht wie es halt geht
-
+        
+        if (aktuellePosition + steps > _felder.Length-1)
+        {
+            _endOfGame = true;
+            _splineUser.SetClipRange(_felder[aktuellePosition], 1);
+            _splineFollower.Restart();
+            _splineFollower.Rebuild();
+            _anim.SetBool("Walk", true);
+            return;
+        }
+        
+        
         if (steps > 0)
         {
 
@@ -188,12 +199,7 @@ public class MovementScript : MonoBehaviour
 
         _anim.SetBool("Walk", true);
 
-        if (aktuellePosition + steps > _felder.Length)
-        {
-            //EndOfGame();
-            
-
-        }
+        
 
     }
 
@@ -225,9 +231,14 @@ public class MovementScript : MonoBehaviour
         _anim.SetBool("Walk",false);
         
     }
-
+    
+    public bool GetEndOfGame()
+    {
+        return _endOfGame;
+    }
+    
     public int GetScore()
     {
-        throw new NotImplementedException();
+        return _badges.GetScore();
     }
 }
