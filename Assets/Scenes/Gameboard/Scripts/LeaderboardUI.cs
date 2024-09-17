@@ -116,23 +116,6 @@ namespace Scenes.Gameboard.Scripts
             _rankObjects = new List<RankObject>();
             _leaderboard = new Leaderboard<Rank>(_settings.MaxRows, new RankingSaverJSON<Rank>());
             
-            Rank row1 = new Rank(1, "aaa", 100);
-            Rank row2 = new Rank(2, "bbb", 30);
-            Rank row3 = new Rank(3, "ccc", 200);
-            Rank row4 = new Rank(4, "ddd", 20);
-            Rank row5 = new Rank(5, "eee", 250);
-            Rank row6 = new Rank(6, "fff", 50);
-            Rank row7 = new Rank(7, "ggg", 220);
-            Rank row8 = new Rank(8, "hhh", 300);
-            Rank row9 = new Rank(9, "iii", 500);
-            Rank row10 = new Rank(10, "jjj", 140);
-            Rank row11 = new Rank(11, "kkk", 10);
-            Rank row12 = new Rank(12, "lll", 17);
-            Rank row13 = new Rank(13, "mmm", 15);
-            Rank row14 = new Rank(14, "nnn", 13);
-            Rank row15 = new Rank(15, "ooo", 19);
-
-            _rows = new Rank[] { row15, row14, row13, row12, row11, row10, row9, row8, row7, row6, row5, row4, row3, row2, row1 };
             
             _leaderboard.AddRows(PATH_RANK, _rows);
             

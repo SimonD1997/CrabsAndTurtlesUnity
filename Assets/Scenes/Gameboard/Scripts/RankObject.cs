@@ -47,7 +47,7 @@ namespace Scenes.Gameboard.Scripts
         public void SetData(int id, int rank, string name, int score)
         {
             _id = id;
-            _rankText.text = $" {rank}";
+            _rankText.text = $"Gruppe: {rank}";
             _nameText.text = $"Name: {name}";
             _scoreText.text = $"Score: {score}";
         }

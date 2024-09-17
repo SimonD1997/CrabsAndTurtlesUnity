@@ -235,9 +235,10 @@ namespace Scenes.Gameboard.Scripts
         {
             
             MovementScript winner = null;
+            int winnerID = 0;
             
             // Check if the player who ended the game is not the starting player
-            if (playerTurn != startingPlayer)
+            if (playerTurn == startingPlayer)
             {
                 // Allow the second player to make one more move
                 NextPlayer();
@@ -282,19 +283,24 @@ namespace Scenes.Gameboard.Scripts
                 else if (playerMovements[0].GetEndOfGame())
                 {
                     winner = playerMovements[0];
+                    winnerID = 1;
+
                 }
                 else if (playerMovements[1].GetEndOfGame())
                 {
                     winner = playerMovements[1];
+                    winnerID = 2;
                 }
                 
 
                 // Display the scoreboard
                 scoreboardUI.SetActive(true);
                 _leaderboardUI.AddRank(rows);
+                _leaderboardUI.RefreshTable();
                 //scoreboardText.text = $"Final Scores:\nPlayer 1: {player1Score}\nPlayer 2: {player2Score}";
                 if (winner != null)
                 {
+                    _leaderboardUI.SetCurrentPlayer(winnerID);
                     scoreboardText.text =winner.gameObject.name + " hat gewonnen!";
                 }else
                 {
@@ -420,7 +426,7 @@ namespace Scenes.Gameboard.Scripts
             inputFieldPlaceholder.text = "";
             timerField.text = "";
             
-            yield return new WaitForSeconds(3);
+            yield return new WaitForSeconds(2);
 
             inputField.text = "";
             timerField.text = "";

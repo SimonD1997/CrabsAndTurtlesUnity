@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Effekseer;
 using UnityEngine;
 
 namespace Scenes.Gameboard.Scripts
@@ -16,6 +17,9 @@ namespace Scenes.Gameboard.Scripts
         private PopUp _popUp;
         private GameObject _popUpGameobject;
         private List<Sprite> _popUpSprites;
+        
+        public EffekseerEffectAsset effect;
+        public EffekseerEmitter emitter;
         
 /// <summary>
 /// Abzeichennummern
@@ -116,6 +120,7 @@ namespace Scenes.Gameboard.Scripts
             if (_popUp == null)
             {
                 _popUp = _popUpGameobject.GetComponentInChildren<PopUp>();
+                
             }
             
             StartCoroutine(ShowingBadgesPopUp());
@@ -124,9 +129,16 @@ namespace Scenes.Gameboard.Scripts
         IEnumerator ShowingBadgesPopUp()
         {
             _popUpGameobject.SetActive(true);
+            
             _popUp.showImagesforSprites(_popUpSprites);
 
-            yield return new WaitForSeconds(6);
+            emitter.Play();
+            //effect.LoadEffect();
+            // Plays effect in transform.position
+            //EffekseerHandle handle = EffekseerSystem.PlayEffect(effect,transform.position);
+            
+            
+            yield return new WaitForSeconds(4);
             
             _popUpSprites.Clear();
             _popUpGameobject.SetActive(false);
