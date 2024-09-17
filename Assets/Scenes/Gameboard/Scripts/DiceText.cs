@@ -1,5 +1,7 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 namespace Scenes.Gameboard.Scripts
 {
@@ -7,6 +9,7 @@ namespace Scenes.Gameboard.Scripts
     {
         private TMP_Text diceText;
         private GameController _gameController;
+        public Button button;
     
         // Start is called before the first frame update
         void Start()
@@ -22,16 +25,23 @@ namespace Scenes.Gameboard.Scripts
         // Update is called once per frame
         void Update()
         {
-        
+            if (_gameController.GetGameState() != 0|| _gameController.debugMode)
+            {
+                button.interactable = false;
+            }else
+            {
+                button.interactable = true;
+            }
         }
 
     
     
         public void Dice()
         {
+            
+            
             int diceRoll = Random.Range(1, 7);
             diceText.text = diceRoll.ToString(); 
-            Debug.Log(diceRoll);
             this._gameController.SetDiceNumber(diceRoll);
         }
     }

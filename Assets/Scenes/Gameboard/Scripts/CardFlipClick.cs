@@ -1,4 +1,5 @@
 using System.Collections;
+using Scenes.Gameboard.Scripts;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
@@ -11,6 +12,7 @@ public class CardFlipClick : MonoBehaviour
     private Animator _anim;
     private Collider _collider;
     private bool _down = true;
+    private GameController _gameController;
     
     void Awake()
     {
@@ -22,7 +24,8 @@ public class CardFlipClick : MonoBehaviour
     {
         _collider = this.gameObject.GetComponent<Collider>();
         _anim = this.gameObject.GetComponent<Animator>();
-        Debug.Log ("CLICKED ");
+        _gameController = FindFirstObjectByType<GameController>();
+
         //this.gameObject.GetComponent<Animator>().enabled = false;
     }
 /// <summary>
@@ -32,13 +35,13 @@ public class CardFlipClick : MonoBehaviour
 /// <param name="hit"></param>
     void ScreenHit(RaycastHit hit)
     {
-        if (hit.collider == _collider)
+        if (hit.collider == _collider && _gameController.GetGameState() == 1)
         {
             //Karte bleibt umgedreht und soll dann nach dem nächsten Würfelwurf vom stapel genommen werden
             if (_down == true)
             {
                 _anim.enabled = true;
-                _anim.SetTrigger("Klick");
+                _anim.SetTrigger("Klick"); 
                 _down = false;
 
 

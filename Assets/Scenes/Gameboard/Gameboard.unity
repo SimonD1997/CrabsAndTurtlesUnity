@@ -2730,6 +2730,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 813b2a8c3e649e4428c4425a21c3453f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  debugMode: 0
   yourTurnField: {fileID: 454181552}
   movementScript: {fileID: 0}
   abzeichen: {fileID: 0}
@@ -4044,7 +4045,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6986768233181138266, guid: 11e2575ed1c7ae44a875994f4f6f2ede, type: 3}
       propertyPath: m_Name
-      value: SnappingTurtle
+      value: Turtle
       objectReference: {fileID: 0}
     - target: {fileID: 6986768233181138266, guid: 11e2575ed1c7ae44a875994f4f6f2ede, type: 3}
       propertyPath: m_Layer
@@ -5101,7 +5102,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 41.95
+  m_fontSize: 41.9
   m_fontSizeBase: 29.81
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -7597,7 +7598,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.51, y: 0.5}
   m_AnchorMax: {x: 0.77, y: 0.5}
-  m_AnchoredPosition: {x: 6.6429443, y: -36.59375}
+  m_AnchoredPosition: {x: 6.6430664, y: -36.59375}
   m_SizeDelta: {x: -26.096037, y: 83.7}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1142704974
@@ -8172,6 +8173,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1cf130938bb52cb458c175c9bae38ae2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  button: {fileID: 1118480046}
 --- !u!1 &1284785243
 GameObject:
   m_ObjectHideFlags: 0
@@ -9170,7 +9172,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0.75, y: 0.5}
-  m_AnchoredPosition: {x: 5.202362, y: 40.59375}
+  m_AnchoredPosition: {x: 5.2023315, y: 40.59375}
   m_SizeDelta: {x: -21.404968, y: 69.06}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1349522820

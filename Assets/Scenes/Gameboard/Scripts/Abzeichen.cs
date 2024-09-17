@@ -146,8 +146,13 @@ namespace Scenes.Gameboard.Scripts
         
         public int GetScore()
         {
-            return 999;
-            throw new NotImplementedException();
+            int score = 0;
+            foreach (var abzeichen in _abzeichenList)
+            {
+                score += abzeichen.GetAbzeichenCount();
+            }
+            
+            return score;
         }
         
     }

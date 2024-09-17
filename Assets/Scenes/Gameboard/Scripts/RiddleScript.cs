@@ -13,6 +13,7 @@ public class RiddleScript : MonoBehaviour
     public byte _elementeAnzahl;
     private List<byte> _elemente;
     private List<int> _elementeRightAnswer;
+    private int _walkRightAnswer = 0; 
     public int _answer;
     int index;
     
@@ -27,6 +28,8 @@ public class RiddleScript : MonoBehaviour
         _variablenTafel = this._gameController.variablenTafel;
         _elemente = new List<byte>();
         _elementeRightAnswer = new List<int>();
+        
+        
         
 
         _spriteRenderer = this.gameObject.GetComponentInChildren<SpriteRenderer>();
@@ -66,7 +69,9 @@ public class RiddleScript : MonoBehaviour
                     _elementeRightAnswer.Add(ElementWert(Convert.ToByte(_cardName[index+1].ToString())));
                     _answer = _elementeRightAnswer[0] * _elementeRightAnswer[1];
                 }
-                
+                index = index+1 + ElementPlusIndex(Convert.ToByte(_cardName[index+1].ToString()));
+                _walkRightAnswer = Convert.ToInt32(_cardName[index].ToString());
+                 
                 
                 break;
             case 3:
@@ -120,6 +125,9 @@ public class RiddleScript : MonoBehaviour
                     _elementeRightAnswer.Add(ElementWert(Convert.ToByte(_cardName[index+1].ToString())));
                     _answer = _answer * _elementeRightAnswer[2];
                 }
+                
+                index = index+1 + ElementPlusIndex(Convert.ToByte(_cardName[index+1].ToString()));
+                _walkRightAnswer = Convert.ToInt32(_cardName[index].ToString());
                 
                 break;
             default:
@@ -194,7 +202,7 @@ public class RiddleScript : MonoBehaviour
         timer.text = _gameController.timerField;
         //timer.StartTimer();
         //timer.timerIsRunning = true;
-        _gameController.StartRiddle(_answer, timer, _abzeichen);
+        _gameController.StartRiddle(_answer, timer, _abzeichen, _walkRightAnswer);
         
     }
 }

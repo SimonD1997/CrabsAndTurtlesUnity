@@ -20,16 +20,20 @@ namespace Scenes.Gameboard.Scripts
 {
     public class GameController : MonoBehaviour
     {
+        public bool debugMode = false;
+        
         private int _diceNumber;
         
         private bool gameIsRunning = false;
         private int playerTurn = 0;
         private int nextMove;
+        private int _gameState = 0; // 0 = dice mode, 1 = draw mode, 2 = card mode
 
         //if an actioncard change an variable the gamecontroller has to check the correct input bevor the next dice roll
         private int _newColourNumber;
         private int _corectionTimes = 1;
         private bool _actionCardState = false;
+        private bool _riddleCardState = false;
         
         
         public TextMeshProUGUI yourTurnField ;
@@ -70,6 +74,7 @@ namespace Scenes.Gameboard.Scripts
         private int startingPlayer;
         private bool endOfGame;
         public LeaderboardUI _leaderboardUI;
+        
 
 
         // Start is called before the first frame update
@@ -85,6 +90,7 @@ namespace Scenes.Gameboard.Scripts
             confirmButtonText.text = "";
             confirmButton.interactable = false;
             
+            variablenTafel.SwitchInputFields(false);
             variablenTafel.SwitchGameobjectState(false);
             
             //Starts the Game:
@@ -144,7 +150,7 @@ namespace Scenes.Gameboard.Scripts
                 }
 
 
-                if (inputFieldEnter == true && nextMove > 0 )
+                if (inputFieldEnter == true && nextMove > 0 && _actionCardState == true)
                 {
                     if (Convert.ToInt32(inputField.text) != nextMove)
                     {
@@ -164,7 +170,6 @@ namespace Scenes.Gameboard.Scripts
                     //inputField.text = "";
                     inputFieldEnter = false;
                 }
-                
             }
             else
             {
@@ -222,6 +227,20 @@ namespace Scenes.Gameboard.Scripts
         {
             return this.playerTurn;
         }
+
+        /// <summary>
+        /// Gets the game state.   
+        /// </summary>
+        /// <returns>0 when in dice mode
+        /// 1 when in draw mode
+        /// 2 when in card mode
+        /// 3 waiting mode</returns>
+        public int GetGameState()
+        {
+            if (_riddleCardState||_actionCardState)  _gameState = 2;
+            
+            return _gameState;
+        } 
         
         public void EndEditInputField()
         {
@@ -251,8 +270,11 @@ namespace Scenes.Gameboard.Scripts
                 this.gameIsRunning = false;
                 
                 this.yourTurnField.gameObject.SetActive(false);
-                this.movementScript.SetCameraActiv(false);
-                this.abzeichen.gameObject.SetActive(false);
+                
+                foreach (var playerMovement in playerMovements)
+                {
+                    playerMovement.SetCameraActiv(false);
+                }
                 
                 // Calculate final scores (example logic)
                 int player1Score = playerMovements[0].GetScore();
@@ -342,6 +364,7 @@ namespace Scenes.Gameboard.Scripts
         public void SetDiceNumber(int diceNumber)
         {
             
+            
             inputField.text = "";
             
             if ( _actionCardState == false)
@@ -356,6 +379,7 @@ namespace Scenes.Gameboard.Scripts
                 lastMovementScript = movementScript;
                 lastMovementScript.SetCameraActiv(true);
                 this.movementScript.Movement(diceNumber);
+                _gameState = 1;
 
                 if (movementScript.GetEndOfGame())
                 {
@@ -418,7 +442,6 @@ namespace Scenes.Gameboard.Scripts
         IEnumerator WaiterToEndOfMove()
         {
             
-            
             bool secondPlayer = confirmButtonEnter == true;
             confirmButtonEnter = false;
             confirmButtonText.text = "";
@@ -426,13 +449,21 @@ namespace Scenes.Gameboard.Scripts
             inputFieldPlaceholder.text = "";
             timerField.text = "";
             
+            _diceNumber = 0;
+            
             yield return new WaitForSeconds(2);
 
             inputField.text = "";
             timerField.text = "";
+
+            if (secondPlayer)
+            {
+                _gameState = 0;
+            }
             
             if (secondPlayer == false)
             {
+                
                 confirmButton.interactable = true;
                 confirmButtonText.text = "Spielzug beenden";
                 
@@ -440,11 +471,13 @@ namespace Scenes.Gameboard.Scripts
                 {
                     if (confirmButtonEnter)
                     {
+                        _gameState = 0;
+                        
                         confirmButtonText.text = "";
                         confirmButton.interactable = false;
                         
                         NextPlayer();
-                    
+                        
                         timerField.text = "";
                         yield break;
                     }
@@ -517,8 +550,9 @@ namespace Scenes.Gameboard.Scripts
            
         }
 
-        public void StartRiddle(int correctAnswer, Timer timer, List<int> abzeichenList)
+        public void StartRiddle(int correctAnswer, Timer timer, List<int> abzeichenList, int walkRightAnswer)
         {
+            _riddleCardState = true;
             this.lastMovementScript = this.movementScript;
             
             inputFieldPlaceholder.text = "Eingabefeld";
@@ -533,6 +567,8 @@ namespace Scenes.Gameboard.Scripts
             
             _timer =  timer;
             _correctAnswer = correctAnswer;
+            nextMove = walkRightAnswer;
+            
             _timer.SetTimerText("Timer: ");
             _timer.timeRemaining = 30;
             //_timer.text = this.timerField;
@@ -569,6 +605,11 @@ namespace Scenes.Gameboard.Scripts
                 Debug.Log("correct Answer");
                 inputField.text = "Richtige Antwort";
                 
+                //movement of player
+                this.movementScript.Movement(nextMove);
+                nextMove = 0;
+                
+                
                 variablenTafel.SwitchGameobjectState(false);
                 this.lastMovementScript.SetCameraActiv(false);
                 variablenTafel.SwitchInputFields(false);
@@ -576,6 +617,9 @@ namespace Scenes.Gameboard.Scripts
                 abzeichen.AddAbzeichen(_abzeichenList);
                 abzeichen.ShowAbzeichen();
                 abzeichen.ShowPopUp();
+                
+                _gameState = 3;
+                _riddleCardState = false;
                 
                 //flip Card after correct Answer
                 GameObject tempCard = this._riddleCardList[0].gameObject;
@@ -602,10 +646,14 @@ namespace Scenes.Gameboard.Scripts
                 }
                 else
                 {
+                    nextMove = 0;
                     
                     variablenTafel.SwitchInputFields(false);
                     variablenTafel.SwitchGameobjectState(false);
                     this.lastMovementScript.SetCameraActiv(false);
+                    
+                    _gameState = 3;
+                    _riddleCardState = false;
                     
                     //flip Card after last Try
                     GameObject tempCard = this._riddleCardList[0].gameObject;
@@ -724,10 +772,10 @@ namespace Scenes.Gameboard.Scripts
                     confirmButton.interactable = false;
                     confirmButtonEnter = false;
                     StartCoroutine(WaiterToEndOfMove());
-                    
+
+                    _gameState = 3;
                     _actionCardState = false;
-
-
+                    
                     timerField.text = "";
                     _corectionTimes = 1;
 
