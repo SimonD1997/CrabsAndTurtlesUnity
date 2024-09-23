@@ -35,7 +35,7 @@ public class CardFlipClick : MonoBehaviour
 /// <param name="hit"></param>
     void ScreenHit(RaycastHit hit)
     {
-        if (hit.collider == _collider && _gameController.GetGameState() == 1)
+        if (hit.collider == _collider && (_gameController.GetGameState() == 1 || _gameController.debugMode))
         {
             //Karte bleibt umgedreht und soll dann nach dem nächsten Würfelwurf vom stapel genommen werden
             if (_down == true)

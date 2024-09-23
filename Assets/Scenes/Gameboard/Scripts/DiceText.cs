@@ -25,12 +25,12 @@ namespace Scenes.Gameboard.Scripts
         // Update is called once per frame
         void Update()
         {
-            if (_gameController.GetGameState() != 0|| _gameController.debugMode)
-            {
-                button.interactable = false;
-            }else
+            if (_gameController.GetGameState() == 0|| _gameController.debugMode)
             {
                 button.interactable = true;
+            }else
+            {
+                button.interactable = false;
             }
         }
 

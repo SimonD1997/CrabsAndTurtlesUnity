@@ -14,10 +14,12 @@ namespace Scenes.Gameboard.Scripts
         int _aktuelleVarRot = 1;
         int _aktuelleVarBlau = 1;
         int _aktuelleVarGelb = 1;
+        
         private List<int> _gruenVarList;
         private List<int> _rotVarList;
         private List<int> _blauVarList;
         private List<int> _gelbVarList;
+        
         public GameObject gruenGameObject;
         public GameObject rotGameObject;
         public GameObject blauGameObject;
@@ -34,6 +36,11 @@ namespace Scenes.Gameboard.Scripts
         private TextMeshProUGUI _redPlaceholder;
         private TextMeshProUGUI _yellowPlaceholder;
         private TextMeshProUGUI _bluePlaceholder;
+
+        private TextMeshProUGUI[] _greenTextFieldList;
+        private TextMeshProUGUI[] _redTextFieldList;
+        private TextMeshProUGUI[] _yellowTextFieldList;
+        private TextMeshProUGUI[] _blueTextFieldList;
         
         
         
@@ -44,6 +51,8 @@ namespace Scenes.Gameboard.Scripts
             _rotVarList = new List<int>();
             _blauVarList = new List<int>();
             _gelbVarList = new List<int>();
+            
+            AddToList();
 
             //_gruen[0] = 
         }
@@ -59,6 +68,11 @@ namespace Scenes.Gameboard.Scripts
             _redPlaceholder = _redTextField.placeholder.gameObject.GetComponent<TextMeshProUGUI>();
             _yellowPlaceholder = _yellowTextField.placeholder.gameObject.GetComponent<TextMeshProUGUI>();
             _bluePlaceholder = _blueTextField.placeholder.gameObject.GetComponent<TextMeshProUGUI>();
+
+            _greenTextFieldList = gruenGameObject.GetComponentsInChildren<TextMeshProUGUI>();
+            _redTextFieldList = rotGameObject.GetComponentsInChildren<TextMeshProUGUI>();
+            _yellowTextFieldList = gelbGameObject.GetComponentsInChildren<TextMeshProUGUI>();
+            _blueTextFieldList = blauGameObject.GetComponentsInChildren<TextMeshProUGUI>();
         }
 
         public void SwitchInputFields(bool inputFieldsActive)
@@ -128,21 +142,23 @@ namespace Scenes.Gameboard.Scripts
         
         public void Gruen()
         {
-            string input = gruenGameObject.GetComponentInChildren<TMP_InputField>().text;
+            string input = _greenTextField.text;
             if (string.IsNullOrEmpty(input))
             {
                 Debug.LogError("Input for Gruen is empty!");
                 return;
             }
+            
 
             _aktuelleVarGruen = Convert.ToInt32(input);
-            addToList();
-            gruenGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarGruen.ToString();
+            _greenPlaceholder.text = input;
+            //addToList();
+            //gruenGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarGruen.ToString();
         }
 
         public void Rot()
         {
-            string input = rotGameObject.GetComponentInChildren<TMP_InputField>().text;
+            string input = _redTextField.text;
             if (string.IsNullOrEmpty(input))
             {
                 Debug.LogError("Input for Rot is empty!");
@@ -150,13 +166,14 @@ namespace Scenes.Gameboard.Scripts
             }
 
             _aktuelleVarRot = Convert.ToInt32(input);
-            addToList();
-            rotGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarRot.ToString();
+            _redPlaceholder.text = input;
+            //addToList();
+            //rotGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarRot.ToString();
         }
 
         public void Blau()
         {
-            string input = blauGameObject.GetComponentInChildren<TMP_InputField>().text;
+            string input = _blueTextField.text;
             if (string.IsNullOrEmpty(input))
             {
                 Debug.LogError("Input for Blau is empty!");
@@ -164,13 +181,14 @@ namespace Scenes.Gameboard.Scripts
             }
 
             _aktuelleVarBlau = Convert.ToInt32(input);
-            addToList();
-            blauGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarBlau.ToString();
+            _bluePlaceholder.text = input;
+            //addToList();
+            //blauGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarBlau.ToString();
         }
 
         public void Gelb()
         {
-            string input = gelbGameObject.GetComponentInChildren<TMP_InputField>().text;
+            string input =_yellowTextField.text;
             if (string.IsNullOrEmpty(input))
             {
                 Debug.LogError("Input for Gelb is empty!");
@@ -178,11 +196,12 @@ namespace Scenes.Gameboard.Scripts
             }
 
             _aktuelleVarGelb = Convert.ToInt32(input);
-            addToList();
-            gelbGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarGelb.ToString();
+            _yellowPlaceholder.text = input;
+            //addToList();
+            //gelbGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarGelb.ToString();
         }
 
-        void addToList()
+        void AddToList()
         {
             _gruenVarList.Add(_aktuelleVarGruen);
             _rotVarList.Add(_aktuelleVarRot);
@@ -194,7 +213,7 @@ namespace Scenes.Gameboard.Scripts
         /// <summary>
         /// Updates the Textfields and Variable Cache with the stored Data
         /// </summary>
-        public void onShow()
+        public void OnShow()
         {
             String stringtemp = "";
             TextMeshProUGUI logTemp = logTextField.GetComponent<TextMeshProUGUI>();
@@ -245,23 +264,43 @@ namespace Scenes.Gameboard.Scripts
             {
                 case 1: //red
                     _aktuelleVarRot= colourVar;
-                    addToList();
-                    rotGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarRot.ToString();
+                    AddToList();
+                    _redTextFieldList[1].text = _aktuelleVarRot.ToString();
+                    if (_rotVarList.Count >1)
+                    {
+                        _redTextFieldList[0].text = _rotVarList[^2].ToString();
+                    }
+                    SwitchInputFields(false);
                     break;
                 case 2: //blue
                     _aktuelleVarBlau = colourVar;
-                    addToList();
-                    blauGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarBlau.ToString();
+                    AddToList();
+                    _blueTextFieldList[1].text = _aktuelleVarBlau.ToString();
+                    if (_blauVarList.Count >1)
+                    {
+                        _blueTextFieldList[0].text = _blauVarList[^2].ToString();
+                    }
+                    SwitchInputFields(false);
                     break;
                 case 3: //gruen
                     _aktuelleVarGruen = colourVar;
-                    addToList();
-                    gruenGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarGruen.ToString();
+                    AddToList();
+                    _greenTextFieldList[1].text = _aktuelleVarGruen.ToString();
+                    if (_gruenVarList.Count >1)
+                    {
+                        _greenTextFieldList[0].text = _gruenVarList[^2].ToString();
+                    }
+                    SwitchInputFields(false);
                     break;
                 case 4: //gelb
                     _aktuelleVarGelb = colourVar;
-                    addToList();
-                    gelbGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarGelb.ToString();
+                    AddToList();
+                    _yellowTextFieldList[1].text = _aktuelleVarGelb.ToString();
+                    if (_gelbVarList.Count >1)
+                    {
+                        _yellowTextFieldList[0].text = _gelbVarList[^2].ToString();
+                    }
+                    SwitchInputFields(false);
                     break;
             }
 

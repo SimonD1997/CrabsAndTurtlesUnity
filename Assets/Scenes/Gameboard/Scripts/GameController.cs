@@ -43,6 +43,7 @@ namespace Scenes.Gameboard.Scripts
         public VariablenTafel variablenTafel;
 
         public GameObject inventory;
+        public GameObject mainMenu;
 
         public List<MovementScript> playerMovements;
         
@@ -131,8 +132,24 @@ namespace Scenes.Gameboard.Scripts
         // Update is called once per frame
         void Update()
         {
+            if(Input.GetKeyDown(KeyCode.Escape)){
+                if (mainMenu.activeSelf)
+                {
+                    mainMenu.SetActive(false);
+                }
+                else
+                {
+                    mainMenu.SetActive(true);
+                }
+                {
+                    
+                }
+            }
+            
             if (gameIsRunning == true)
             {
+                
+                
                 if (playerTurn == 0)
                 {
                     
