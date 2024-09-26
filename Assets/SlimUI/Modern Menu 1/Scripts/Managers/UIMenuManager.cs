@@ -30,6 +30,8 @@ namespace SlimUI.ModernMenu{
         [Header("PANELS")]
         [Tooltip("The UI Panel parenting all sub menus")]
         public GameObject mainCanvas;
+        [Tooltip("The UI Panel parenting all setting menus")]
+        public GameObject settingCanvas;
         [Tooltip("The UI Panel that holds the CONTROLS window tab")]
         public GameObject PanelControls;
         [Tooltip("The UI Panel that holds the VIDEO window tab")]
@@ -252,6 +254,7 @@ namespace SlimUI.ModernMenu{
 			if(extrasMenu) extrasMenu.SetActive(true);
 			exitMenu.SetActive(false);
 		}
+		
 
 		public void QuitGame(){
 			#if UNITY_EDITOR
@@ -266,6 +269,8 @@ namespace SlimUI.ModernMenu{
 			AsyncOperation operation = SceneManager.LoadSceneAsync(sceneName);
 			operation.allowSceneActivation = false;
 			mainCanvas.SetActive(false);
+			DisablePanels();	
+			settingCanvas.SetActive(false);
 			loadingMenu.SetActive(true);
 
 			while (!operation.isDone){

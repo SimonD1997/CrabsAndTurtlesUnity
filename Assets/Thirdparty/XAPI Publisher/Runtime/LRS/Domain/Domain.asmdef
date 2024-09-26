@@ -1,0 +1,23 @@
+{
+    "name": "LRS.Domain",
+    "rootNamespace": "",
+    "references": [
+        "GUID:713bcb041f48d19f0be3e9bccd45f278",
+        "GUID:a239677e92e1442baa2eb0f9939172f0",
+        "GUID:f1ff0f022513711729e9ed0e16aceb87",
+        "GUID:b278dc884bb5bac48823091dd98ac2fc",
+        "GUID:283fad36d93e98248a5e8d15d4c145ca",
+        "GUID:546d6dce3dfd7724299e114f5e8655a2",
+        "GUID:b7a47a15a3b4e784dbcc0bddcc990fcf",
+        "GUID:3b7309fd3da1afa4487c69c8a2f2e839"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

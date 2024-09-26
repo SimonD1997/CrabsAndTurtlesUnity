@@ -20,7 +20,7 @@ TagManager:
   - Board
   - Endscreen
   - Screen
-  - Occluder
+  - Dice
   - Crab(Camera)
   - Turtle(Camera)
   - 
