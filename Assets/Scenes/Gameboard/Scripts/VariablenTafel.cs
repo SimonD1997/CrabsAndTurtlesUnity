@@ -149,7 +149,6 @@ namespace Scenes.Gameboard.Scripts
                 return;
             }
             
-
             _aktuelleVarGruen = Convert.ToInt32(input);
             _greenPlaceholder.text = input;
             //addToList();
@@ -251,6 +250,16 @@ namespace Scenes.Gameboard.Scripts
 
             return colourVar;
         }
+/// <summary>
+/// move all variables of the second textfiel to the first textfield 
+/// </summary>
+        void MoveVariablesUp()
+        {
+            _greenTextFieldList[0].text = _greenTextFieldList[1].text;
+            _redTextFieldList[0].text = _redTextFieldList[1].text;
+            _blueTextFieldList[0].text = _blueTextFieldList[1].text;
+            _yellowTextFieldList[0].text = _yellowTextFieldList[1].text;
+        }
         
         /// <summary>
         /// 
@@ -259,47 +268,47 @@ namespace Scenes.Gameboard.Scripts
         /// <param name="colourVar"></param>
         public void SetVar(int colour, int colourVar)
         {
-            
+            MoveVariablesUp();
             switch (colour)
             {
                 case 1: //red
                     _aktuelleVarRot= colourVar;
                     AddToList();
                     _redTextFieldList[1].text = _aktuelleVarRot.ToString();
-                    if (_rotVarList.Count >1)
-                    {
-                        _redTextFieldList[0].text = _rotVarList[^2].ToString();
-                    }
+                    // if (_rotVarList.Count >1)
+// {
+//     _redTextFieldList[0].text = _rotVarList[^2].ToString();
+// }
                     SwitchInputFields(false);
                     break;
                 case 2: //blue
                     _aktuelleVarBlau = colourVar;
                     AddToList();
                     _blueTextFieldList[1].text = _aktuelleVarBlau.ToString();
-                    if (_blauVarList.Count >1)
-                    {
-                        _blueTextFieldList[0].text = _blauVarList[^2].ToString();
-                    }
+                    //if (_blauVarList.Count >1)
+                    //{
+                   //     _blueTextFieldList[0].text = _blauVarList[^2].ToString();
+                    //}
                     SwitchInputFields(false);
                     break;
                 case 3: //gruen
                     _aktuelleVarGruen = colourVar;
                     AddToList();
                     _greenTextFieldList[1].text = _aktuelleVarGruen.ToString();
-                    if (_gruenVarList.Count >1)
+                    /*if (_gruenVarList.Count >1)
                     {
                         _greenTextFieldList[0].text = _gruenVarList[^2].ToString();
-                    }
+                    }*/
                     SwitchInputFields(false);
                     break;
                 case 4: //gelb
                     _aktuelleVarGelb = colourVar;
                     AddToList();
                     _yellowTextFieldList[1].text = _aktuelleVarGelb.ToString();
-                    if (_gelbVarList.Count >1)
+                    /*if (_gelbVarList.Count >1)
                     {
                         _yellowTextFieldList[0].text = _gelbVarList[^2].ToString();
-                    }
+                    }*/
                     SwitchInputFields(false);
                     break;
             }

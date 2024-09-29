@@ -1,11 +1,15 @@
 using Dreamteck.Splines;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Scenes.Gameboard.Scripts
 {
     public class MovementScript : MonoBehaviour
     {
-        public GameObject _canvas;
+        public BoardFieldView canvasCamera;
+
+        public Sprite playerIcon;
+        public RenderTexture cameraImage;
         private SplineUser _splineUser;
         private Dreamteck.Splines.SplineFollower _splineFollower;
         private int aktuellePosition;
@@ -149,7 +153,15 @@ namespace Scenes.Gameboard.Scripts
 
         public void SetCameraActiv(bool activ)
         {
+            if (activ)
+            {
+                canvasCamera.SetImages(cameraImage,playerIcon);
+            }
+            
             _camera.enabled = activ;
+            canvasCamera.gameObject.SetActive(activ);
+            
+            
             //_canvas.SetActive(activ);
         } 
         

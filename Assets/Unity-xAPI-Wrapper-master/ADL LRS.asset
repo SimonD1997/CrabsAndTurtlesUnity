@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   config:
     authMethod: 0
-    endpoint: https://lrs.adlnet.gov/xapi/
+    endpoint: /
     username: tom
     password: 1234
     basicAuth: dG9tOjEyMzQ=
