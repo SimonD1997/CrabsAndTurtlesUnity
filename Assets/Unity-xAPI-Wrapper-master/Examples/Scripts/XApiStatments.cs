@@ -16,7 +16,7 @@ namespace XAPI.Examples
             actor = Actor.FromMailbox("mailto:example@game.com",false ,"Gruppe 1");
             activity = new Activity("http://game.doubleday.de", "Crabs and Turtles");
             
-            SendSimpleStatement();
+            //SendSimpleStatement();
         }
 
         public void SendSimpleStatement(Verb verb)

@@ -1,70 +1,114 @@
 using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
-public class Diece : MonoBehaviour
+namespace Scenes.Gameboard.Scripts
 {
-    
-    private Camera cam;
-    private Vector3 initPos;
-    private object initXpose;
-    private Rigidbody rb;
-   
-    
-    void Awake()
+    public class Diece : MonoBehaviour
     {
         
-    }
-    
-    // Start is called before the first frame update
-    void Start()
-    {
-        cam = Camera.main;
-        
-        rb = this.gameObject.GetComponent<Rigidbody>();
-    }
+        private Rigidbody rb;
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetMouseButtonDown (0))
+        private int _diceNumber;
+
+        private GameController _gameController;
+        public Button _button;
+
+
+        void Awake()
         {
-//initial click to roll a dice
-            initPos = Input.mousePosition;
- 
-//return x component of dice from screen to view point
-            initXpose = cam.ScreenToViewportPoint (Input.mousePosition).x;
         }
- 
-//current position of mouse
-        Vector3 currentPos = Input.mousePosition;
- 
-//get all position along with mouse pointer movement
-        Vector3 newPos = cam.ScreenToWorldPoint (new Vector3(currentPos.x,currentPos.y,Mathf.Clamp(currentPos.y/10,10,50)));
- 
-//translate from screen to world coordinates  
-        newPos = cam.ScreenToWorldPoint (currentPos);
- 
-        if (Input.GetMouseButtonUp (0))
+
+        // Start is called before the first frame update
+        void Start()
         {
-            initPos = cam.ScreenToWorldPoint (initPos);
- 
-//Method use to roll the dice
-            RollTheDice(newPos);
-//use identify face value on dice
-            //StartCoroutine(GetDiceCount ());
+            _gameController = FindFirstObjectByType<GameController>();
+            
+            rb = this.gameObject.GetComponent<Rigidbody>();
         }
- 
-//Method Roll the Dice
-        void RollTheDice(Vector3 lastPos)
+
+        // Update is called once per frame
+        void Update()
         {
-            rb.AddTorque(Vector3.Cross(lastPos, initPos) * 1000, ForceMode.Impulse);
-            lastPos.y += 12;
-            rb.AddForce (((lastPos - initPos).normalized) * ((Vector3.Distance (lastPos, initPos)) * 25 * rb.mass));
-        } 
+            if (_gameController.GetGameState() == 0|| _gameController.debugMode)
+            {
+                _button.interactable = true;
+            }else
+            {
+                _button.interactable = false;
+            }
+
+        }
+
+        
+
+        public void RollTheDice()
+        {
+            Debug.Log("Roll The Dice");
+            
+            _diceNumber = 0;
+
+            rb.mass = 1;
+            rb.AddForce(Vector3.back * (Random.Range(100, 150) *25* rb.mass));
+            rb.AddForce(Vector3.right * (Random.Range(10, 15)));
+            rb.AddTorque(Random.Range(0, 99), Random.Range(0, 99), Random.Range(0, 99), ForceMode.Impulse);
+
+            StartCoroutine(WaitforDiceDown());
+        }
+
+        IEnumerator WaitforDiceDown()
+        {
+            yield return new WaitForSeconds(0.6f);
+            rb.AddForce(Vector3.back * (Random.Range(100, 150) * rb.mass));
+            rb.AddTorque(Random.Range(0, 99), Random.Range(0, 99), Random.Range(0, 99), ForceMode.Impulse);
+
+            yield return new WaitForSeconds(1f);
+
+            Debug.Log(" Dice is Down");
+            rb.velocity = Vector3.zero;
+            //rb.MovePosition(new Vector3(0,0,0));
+            rb.mass = 5000;
+            rb.AddForce(Vector3.forward * 2000, ForceMode.Impulse);
+
+            StartCoroutine(GetDiceCount());
+        }
+
+        private IEnumerator GetDiceCount()
+        {
+            yield return new WaitForSeconds(1f);
+            
+            // Logic to identify the face value of the dice
+
+            Vector3 up = Vector3.back;
+
+            while (_diceNumber == 0)
+            {
+                if (Vector3.Dot(up, transform.forward) > 0.9f) _diceNumber = 1;
+                if (Vector3.Dot(up, -transform.forward) > 0.9f) _diceNumber = 6;
+                if (Vector3.Dot(up, transform.up) > 0.9f) _diceNumber = 2;
+                if (Vector3.Dot(up, -transform.up) > 0.9f) _diceNumber = 5;
+                if (Vector3.Dot(up, -transform.right) > 0.9f) _diceNumber = 3;
+                if (Vector3.Dot(up, transform.right) > 0.9f) _diceNumber = 4;
+                 // Error case
+                 
+                 // If the dice is not in the correct position, then push the dice down
+                 if (_diceNumber == 0)
+                 {
+                     rb.mass = 1;
+                     yield return new WaitForSeconds(0.2f);
+                     rb.mass = 5000;
+                     rb.AddForce(Vector3.forward * 2000, ForceMode.Impulse);
+                     rb.AddTorque(Vector3.right*5, ForceMode.Impulse);
+                 }
+                yield return _diceNumber;
+                
+            }
+
+            Debug.Log(_diceNumber);
+            this._gameController.SetDiceNumber(_diceNumber);
+        }
     }
-    
-    
-    
 }
+            
+  

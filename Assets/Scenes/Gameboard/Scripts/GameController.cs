@@ -37,6 +37,8 @@ namespace Scenes.Gameboard.Scripts
         
         
         public TextMeshProUGUI yourTurnField ;
+        public RawImage playerImage;
+        public RenderTexture[] playerImages;
         public MovementScript movementScript;
         private MovementScript lastMovementScript;
         public Abzeichen abzeichen;
@@ -155,11 +157,13 @@ namespace Scenes.Gameboard.Scripts
                     
                     this.yourTurnField.gameObject.SetActive(true);
                     this.yourTurnField.text = "CRAB IST DRAN!";
+                    this.playerImage.texture = playerImages[0];
                 }else if (playerTurn == 1)
                 {
                     
                     this.yourTurnField.gameObject.SetActive(true);
                     this.yourTurnField.text = "TURTLE IST DRAN!";
+                    this.playerImage.texture = playerImages[1];
                 }
                 else
                 {
@@ -197,6 +201,12 @@ namespace Scenes.Gameboard.Scripts
                 this.inventory.gameObject.SetActive(false);
                 
             }
+
+            if (_gameState == 0)
+            {
+                movementScript.GetAnimator().SetInteger("Face",0);
+            }
+            
         }
 
 
@@ -233,6 +243,7 @@ namespace Scenes.Gameboard.Scripts
                 playerTurn = 0;
             }
             this.movementScript = playerMovements[playerTurn];
+            movementScript.GetAnimator().SetInteger("Face",0);
             this.abzeichen = this.movementScript.gameObject.GetComponent<Abzeichen>();
             this.abzeichen.ShowAbzeichen();
         }
@@ -420,7 +431,7 @@ namespace Scenes.Gameboard.Scripts
                     //Karten alle um eins nach oben verschieben und neue Karte unten anfügen
                 
                     MoveCardsUp(_cardList);
-                    AddCardStack(_cardList,cardPrefab,cardPrefabStack,4);
+                    AddCardStack(_cardList,cardPrefab,cardPrefabStack,-7);
                 }
 
                 if (tempCard2.GetComponent<CardFlipClick>().GetTurnState() == false)
@@ -433,7 +444,7 @@ namespace Scenes.Gameboard.Scripts
                     
                 
                     MoveCardsUp(_riddleCardList);
-                    AddCardStack(_riddleCardList,riddleCardPrefab,riddlePrefabStack,-15);
+                    AddCardStack(_riddleCardList,riddleCardPrefab,riddlePrefabStack,-23);
                 }
                 
             }
@@ -514,7 +525,7 @@ namespace Scenes.Gameboard.Scripts
             
             for (int i = 0; i < 5; i++)
             {
-                GameObject tempCard = Instantiate(riddleCardPrefab, new Vector3(-40, -15, i), riddleCardPrefab.transform.rotation);
+                GameObject tempCard = Instantiate(riddleCardPrefab, new Vector3(-35, -23, i), riddleCardPrefab.transform.rotation);
                 //tempCard.transform.rotation.Set(89,0,0,0 );
                 tempCard.GetComponentInChildren<SpriteRenderer>().sprite = riddlePrefabStack[Random.Range(0,riddlePrefabStack.Length)];
                 //this._cardStack[i] = tempCard;
@@ -523,7 +534,7 @@ namespace Scenes.Gameboard.Scripts
             }
             for (int i = 0; i < 5; i++)
             {
-                GameObject tempCard = Instantiate(cardPrefab, new Vector3(-40, 4, i), riddleCardPrefab.transform.rotation);
+                GameObject tempCard = Instantiate(cardPrefab, new Vector3(-35, -7, i), riddleCardPrefab.transform.rotation);
                 tempCard.GetComponentInChildren<SpriteRenderer>().sprite = cardPrefabStack[Random.Range(0,cardPrefabStack.Length)];
                 _cardList.Add(tempCard);
             }
@@ -561,7 +572,7 @@ namespace Scenes.Gameboard.Scripts
         /// <param name="yPosition">The y position to place the card at.</param>
         private void AddCardStack(List<GameObject> cardList, GameObject prefab, Sprite[] spriteStack,int yPosition)
         {
-            GameObject tempCard = Instantiate(prefab, new Vector3(-40, yPosition, 4), riddleCardPrefab.transform.rotation);
+            GameObject tempCard = Instantiate(prefab, new Vector3(-35, yPosition, 4), riddleCardPrefab.transform.rotation);
             tempCard.GetComponentInChildren<SpriteRenderer>().sprite = spriteStack[Random.Range(0,spriteStack.Length)];
             cardList.Add(tempCard);
            
@@ -590,6 +601,8 @@ namespace Scenes.Gameboard.Scripts
             _timer.timeRemaining = 30;
             //_timer.text = this.timerField;
             _timer.StartTimer();
+            
+            movementScript.GetAnimator().SetInteger("Face",3);
             
             _abzeichenList = abzeichenList;
             
@@ -621,6 +634,7 @@ namespace Scenes.Gameboard.Scripts
             {
                 Debug.Log("correct Answer");
                 inputField.text = "Richtige Antwort";
+                movementScript.GetAnimator().SetInteger("Face",1);
                 
                 //movement of player
                 this.movementScript.Movement(nextMove);
@@ -645,7 +659,7 @@ namespace Scenes.Gameboard.Scripts
                     StartCoroutine(WaiterAnimator(tempCard));
                     this._riddleCardList.RemoveAt(0);
                     MoveCardsUp(_riddleCardList);
-                    AddCardStack(_riddleCardList,riddleCardPrefab,riddlePrefabStack,-15);
+                    AddCardStack(_riddleCardList,riddleCardPrefab,riddlePrefabStack,-23);
                 }
                 
                 StartCoroutine(WaiterToEndOfMove());
@@ -656,6 +670,8 @@ namespace Scenes.Gameboard.Scripts
             {
                 Debug.Log("wrong Answer");
                 inputField.text = "Falsche Antwort";
+                movementScript.GetAnimator().SetInteger("Face",4);
+                
                 if (firstTry)
                 {
                     NextPlayer();
@@ -679,7 +695,7 @@ namespace Scenes.Gameboard.Scripts
                         StartCoroutine(WaiterAnimator(tempCard));
                         this._riddleCardList.RemoveAt(0);
                         MoveCardsUp(_riddleCardList);
-                        AddCardStack(_riddleCardList,riddleCardPrefab,riddlePrefabStack,-15);
+                        AddCardStack(_riddleCardList,riddleCardPrefab,riddlePrefabStack,-23);
                     }
                     
                     StartCoroutine(WaiterToEndOfMove());
@@ -724,6 +740,7 @@ namespace Scenes.Gameboard.Scripts
             _timer.timeRemaining = 5;
             inputField.text = "Falsche Antwort! Das andere Team bekommt die Chance!";
             _timer.StartTimer();
+            
             yield return new WaitForSeconds(5);
             
             inputField.text = "";
@@ -732,6 +749,7 @@ namespace Scenes.Gameboard.Scripts
             _timer.SetTimerText("Timer: ");
             _timer.timeRemaining = 30;
             _timer.StartTimer();
+            movementScript.GetAnimator().SetInteger("Face",4);
             
             Debug.Log("correct Answer:" + _correctAnswer);
             
@@ -773,7 +791,8 @@ namespace Scenes.Gameboard.Scripts
 
                     if (_newColourNumber == variablenTafel.GetVar(movementScript.GetPositionColour()))
                     {
-                        inputField.text = "Richtige Antwort!"; 
+                        inputField.text = "Richtige Antwort!";
+                        movementScript.GetAnimator().SetInteger("Face",1);
                     }
                     
                     if (_corectionTimes == 1)
@@ -802,7 +821,7 @@ namespace Scenes.Gameboard.Scripts
                     this._cardList.RemoveAt(0);
                     //Karten alle um eins nach oben verschieben und neue Karte unten anfügen
                     MoveCardsUp(_cardList);
-                    AddCardStack(_cardList, cardPrefab, cardPrefabStack, 4);
+                    AddCardStack(_cardList, cardPrefab, cardPrefabStack, -7);
 
                     
 
@@ -820,6 +839,7 @@ namespace Scenes.Gameboard.Scripts
                 {
                     timerField.text =
                         "Falscher Spielzug: Überprüfe die Variablentafel! Du hast eine korrektur Möglichkeit!";
+                    movementScript.GetAnimator().SetInteger("Face",2);
                     _corectionTimes -= 1;
                     confirmButtonEnter = false;
                 }else if (_newColourNumber == -999 && nextMove == 0)
@@ -844,7 +864,7 @@ namespace Scenes.Gameboard.Scripts
                     this._cardList.RemoveAt(0);
                     //Karten alle um eins nach oben verschieben und neue Karte unten anfügen
                     MoveCardsUp(_cardList);
-                    AddCardStack(_cardList, cardPrefab, cardPrefabStack, 4);
+                    AddCardStack(_cardList, cardPrefab, cardPrefabStack, -7);
                     
                     
                     
