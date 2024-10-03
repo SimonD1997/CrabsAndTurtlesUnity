@@ -28,22 +28,22 @@ public class KeyboardButtonController : MonoBehaviour
     }
 
     public void AddLetter() {
-        if(GameManager.Instance != null) {
-            GameManager.Instance.AddLetter(containerText.text);
+        if(KeyboardManager.Instance != null) {
+            KeyboardManager.Instance.AddLetter(containerText.text);
         } else {
             Debug.Log(containerText.text + " is pressed");
         }
     }
     public void DeleteLetter() { 
-        if(GameManager.Instance != null) {
-            GameManager.Instance.DeleteLetter();
+        if(KeyboardManager.Instance != null) {
+            KeyboardManager.Instance.DeleteLetter();
         } else {
             Debug.Log("Last char deleted");
         }
     }
     public void SubmitWord() {
-        if(GameManager.Instance != null) {
-            GameManager.Instance.SubmitWord();
+        if(KeyboardManager.Instance != null) {
+            KeyboardManager.Instance.SubmitWord();
         } else {
             Debug.Log("Submitted successfully!");
         }

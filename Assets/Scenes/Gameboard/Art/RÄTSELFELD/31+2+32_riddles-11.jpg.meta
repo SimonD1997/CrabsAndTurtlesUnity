@@ -97,9 +97,9 @@ TextureImporter:
     buildTarget: WebGL
     maxTextureSize: 512
     resizeAlgorithm: 0
-    textureFormat: 10
+    textureFormat: 64
     textureCompression: 1
-    compressionQuality: 50
+    compressionQuality: 100
     crunchedCompression: 0
     allowsAlphaSplitting: 0
     overridden: 1
@@ -162,5 +162,5 @@ TextureImporter:
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+  assetBundleName: riddlecard
+  assetBundleVariant: 1

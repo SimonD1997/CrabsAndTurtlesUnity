@@ -11,6 +11,7 @@ namespace Scenes.Gameboard.Scripts
         private Rigidbody rb;
 
         private int _diceNumber;
+        private bool _diceInMotion;
 
         private GameController _gameController;
         public Button _button;
@@ -31,7 +32,7 @@ namespace Scenes.Gameboard.Scripts
         // Update is called once per frame
         void Update()
         {
-            if (_gameController.GetGameState() == 0|| _gameController.debugMode)
+            if ((_gameController.GetGameState() == 0|| _gameController.debugMode )&& _diceInMotion == false)
             {
                 _button.interactable = true;
             }else
@@ -48,6 +49,7 @@ namespace Scenes.Gameboard.Scripts
             Debug.Log("Roll The Dice");
             
             _diceNumber = 0;
+            _diceInMotion = true;
 
             rb.mass = 1;
             rb.AddForce(Vector3.back * (Random.Range(100, 150) *25* rb.mass));
@@ -107,6 +109,8 @@ namespace Scenes.Gameboard.Scripts
 
             Debug.Log(_diceNumber);
             this._gameController.SetDiceNumber(_diceNumber);
+            _diceInMotion = false;
+            
         }
     }
 }

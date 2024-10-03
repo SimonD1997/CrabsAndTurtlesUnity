@@ -1,16 +1,16 @@
 using UnityEngine;
 using TMPro;
 
-public class GameManager : MonoBehaviour
+public class KeyboardManager : MonoBehaviour
 {
-    public static GameManager Instance;
-    [SerializeField] TextMeshProUGUI textBox;
+    public static KeyboardManager Instance;
+    [SerializeField] TMP_InputField textBox;
     [SerializeField] TextMeshProUGUI printBox;
 
     private void Start()
     {
         Instance = this;
-        printBox.text = "";
+        //printBox.text = "";
         textBox.text = "";
     }
 
