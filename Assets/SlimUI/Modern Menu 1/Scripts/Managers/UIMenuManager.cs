@@ -18,6 +18,8 @@ namespace SlimUI.ModernMenu{
         public GameObject playMenu;
         [Tooltip("The Menu for when the EXIT button is clicked")]
         public GameObject exitMenu;
+        [Tooltip("Menu to fill in the XAPI Credetials")] 
+        public GameObject xAPIMenu;
         [Tooltip("Optional 4th Menu")]
         public GameObject extrasMenu;
 
@@ -88,6 +90,7 @@ namespace SlimUI.ModernMenu{
 			playMenu.SetActive(false);
 			exitMenu.SetActive(false);
 			if(extrasMenu) extrasMenu.SetActive(false);
+			if(xAPIMenu) xAPIMenu.SetActive(false);
 			firstMenu.SetActive(true);
 			mainMenu.SetActive(true);
 
@@ -122,12 +125,14 @@ namespace SlimUI.ModernMenu{
 		public void PlayCampaign(){
 			exitMenu.SetActive(false);
 			if(extrasMenu) extrasMenu.SetActive(false);
+			if(xAPIMenu) xAPIMenu.SetActive(false);
 			playMenu.SetActive(true);
 		}
 		
 		public void PlayCampaignMobile(){
 			exitMenu.SetActive(false);
 			if(extrasMenu) extrasMenu.SetActive(false);
+			if(xAPIMenu) xAPIMenu.SetActive(false);
 			playMenu.SetActive(true);
 			mainMenu.SetActive(false);
 		}
@@ -135,6 +140,7 @@ namespace SlimUI.ModernMenu{
 		public void ReturnMenu(){
 			playMenu.SetActive(false);
 			if(extrasMenu) extrasMenu.SetActive(false);
+			if(xAPIMenu) xAPIMenu.SetActive(false);
 			exitMenu.SetActive(false);
 			mainMenu.SetActive(true);
 		}
@@ -239,12 +245,14 @@ namespace SlimUI.ModernMenu{
 		public void AreYouSure(){
 			exitMenu.SetActive(true);
 			if(extrasMenu) extrasMenu.SetActive(false);
+			if(xAPIMenu) xAPIMenu.SetActive(false);
 			DisablePlayCampaign();
 		}
 
 		public void AreYouSureMobile(){
 			exitMenu.SetActive(true);
 			if(extrasMenu) extrasMenu.SetActive(false);
+			if(xAPIMenu) xAPIMenu.SetActive(false);
 			mainMenu.SetActive(false);
 			DisablePlayCampaign();
 		}
@@ -252,9 +260,16 @@ namespace SlimUI.ModernMenu{
 		public void ExtrasMenu(){
 			playMenu.SetActive(false);
 			if(extrasMenu) extrasMenu.SetActive(true);
+			if(xAPIMenu) xAPIMenu.SetActive(false);
 			exitMenu.SetActive(false);
 		}
-		
+
+		public void XapiMenu() {
+			playMenu.SetActive(false);
+			if(extrasMenu) extrasMenu.SetActive(false);
+			if(xAPIMenu) xAPIMenu.SetActive(true);
+			exitMenu.SetActive(false);
+		} 
 
 		public void QuitGame(){
 			#if UNITY_EDITOR

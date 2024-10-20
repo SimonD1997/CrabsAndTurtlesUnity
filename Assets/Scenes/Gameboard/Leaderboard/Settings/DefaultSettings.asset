@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b178aaa56aaa124ebb5f771087d24d5, type: 3}
   m_Name: DefaultSettings
   m_EditorClassIdentifier: 
-  _maxRows: 5
-  _usePagination: 1
+  _maxRows: 4
+  _usePagination: 0
   _highlightCurrentPlayer: 1

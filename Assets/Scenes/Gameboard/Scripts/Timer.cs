@@ -10,9 +10,13 @@ namespace Scenes.Gameboard.Scripts
         public float timeRemaining = 30;
         private string _timeText;
         public bool timerIsRunning = false;
+
+        public AudioSource audioSource;
+        public AudioClip soundClip;
+
         
-        
-        
+
+
         // Update is called once per frame
         void Update()
         {
@@ -25,31 +29,68 @@ namespace Scenes.Gameboard.Scripts
                 }
                 else
                 {
-                    timeRemaining = 0;
-                    timerIsRunning = false;
+                    StopTimer();
                 } 
                 //Debug.Log("Timer:" + timeRemaining);
+                this.text.text = _timeText + Convert.ToInt32(timeRemaining).ToString();
+            }
+            
+
+            if (timeRemaining < 5)
+            {
+                // Fade Sound UP
+                FadeSound(0.01f);
+            }
+            
+            if (timeRemaining < 29 && timeRemaining > 5)
+            {
+                // Fade Sound Down
+                FadeSound(-0.005f);
                 
             }
-            this.text.text = _timeText + Convert.ToInt32(timeRemaining).ToString();
-            
            
         }
 
-       public void StartTimer()
+        public void InitTimer(TextMeshProUGUI text)
         {
+            this.text = text; 
+            audioSource = text.gameObject.GetComponent<AudioSource>();
+        }
+
+       public void StartTimer(bool sound)
+        {
+            if (sound) PlaySound();
+            
             timerIsRunning = true;
+            
         }
 
         public void StopTimer()
         {
             timerIsRunning = false;
             timeRemaining = 0;
+            StopSound();
         }
 
         public void SetTimerText(string timerText)
         {
             _timeText = timerText;
+        }
+
+        private void PlaySound()
+        {
+            audioSource.volume = 1;
+            audioSource.Play();
+        }
+
+        private void StopSound()
+        {
+            audioSource.Stop();
+        }
+
+        private void FadeSound(float volume)
+        {
+            audioSource.volume += volume;
         }
     }
 }

@@ -11,6 +11,13 @@ namespace Scenes.Gameboard.Scripts
         private AbzeichenObjects[] _abzeichenObjectsArray;
         public Image playerIcon;
         public GameObject _popUp;
+        
+        public GridLayoutGroup gridLayoutGroup;
+        public RectTransform parentRectTransform;
+
+        private List<AbzeichenObjects> _abzeichenObjectsList;
+        
+        
     
         // Start is called before the first frame update
         void Start()
@@ -20,40 +27,62 @@ namespace Scenes.Gameboard.Scripts
 
         public void SetInventory(List<AbzeichenObjects> abzeichenObjectsList)
         {
-            for (int i = 0; i < abzeichenObjectsList.Count; i++)
-            {
-                _abzeichenObjectsArray[i] = abzeichenObjectsList[i];
-                imageSlots[i].enabled = true;
-                imageSlots[i].sprite = abzeichenObjectsList[i].GetSprite();
+            this._abzeichenObjectsList = abzeichenObjectsList;
+            UpdateInventory();
+        
+        }
 
-                int abzeichennumber = abzeichenObjectsList[i].GetAbzeichenCount();
+        public void UpdateInventory()
+        {
+            for (int i = 0; i < _abzeichenObjectsList.Count; i++)
+            {
+                _abzeichenObjectsArray[i] = _abzeichenObjectsList[i];
+                //TODO
+                //imageSlots[i].enabled = true;
+                //imageSlots[i].sprite = abzeichenObjectsList[i].GetSprite();
+
+                int abzeichennumber = _abzeichenObjectsList[i].GetAbzeichenCount();
                 if (abzeichennumber > 1)
                 {
                     imageSlots[i].gameObject.GetComponentInChildren<TMP_Text>().text = abzeichennumber.ToString();
-                }
-                else
+                    imageSlots[i].color = Color.white;
+                }else if (abzeichennumber == 0)
+                {
+                    imageSlots[i].color = new Color(0.5f,0.5f,0.5f,0.2f);
+                    imageSlots[i].gameObject.GetComponentInChildren<TMP_Text>().text = "";
+                }else
                 {
                     imageSlots[i].gameObject.GetComponentInChildren<TMP_Text>().text = "";
+                    imageSlots[i].color = Color.white;
                 }
             
             }
-
-            for (int i = abzeichenObjectsList.Count; i < (imageSlots.Length - (abzeichenObjectsList.Count)); i++)
-            {
-                imageSlots[i].enabled = false;
-            }
-        
+            
         }
 
         public void SetPlayerIcon(Sprite playerIcon)
         {
             this.playerIcon.sprite = playerIcon;
         }
-    
-        // Update is called once per frame
-        void Update()
+        
+        public void SetGridLayoutGroup()
         {
+            float parentWidth = parentRectTransform.rect.width;
+            float parentHeight = parentRectTransform.rect.height;
+            int columns = gridLayoutGroup.constraintCount;
+
+            float cellWidth = (parentWidth - gridLayoutGroup.padding.left - gridLayoutGroup.padding.right - (columns - 1) * gridLayoutGroup.spacing.x) / columns;
+            float cellHeight = (parentHeight - gridLayoutGroup.padding.top - gridLayoutGroup.padding.bottom - (gridLayoutGroup.transform.childCount / columns - 1) * gridLayoutGroup.spacing.y) / (gridLayoutGroup.transform.childCount / columns);
+
+            gridLayoutGroup.cellSize = new Vector2(cellHeight, cellHeight);
         
         }
+        
+        void Update()
+        {
+            SetGridLayoutGroup();
+        }
+    
+        
     }
 }

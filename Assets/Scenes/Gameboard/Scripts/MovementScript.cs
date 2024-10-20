@@ -12,11 +12,16 @@ namespace Scenes.Gameboard.Scripts
         public RenderTexture cameraImage;
         private SplineUser _splineUser;
         private Dreamteck.Splines.SplineFollower _splineFollower;
-        private int aktuellePosition;
+        public int aktuellePosition;
+        private int endPosition = 40;
+        
         private Animator _anim;
         private Camera _camera;
     
         private Abzeichen _badges;
+        
+        private AudioSource _audioSource;
+        public AudioClip audioClipWalking;
     
         /// <summary>
         /// gerade positionen sind rästelkarten und ungerade sind ereigniskarten
@@ -31,7 +36,12 @@ namespace Scenes.Gameboard.Scripts
         // Array für distanzen der einzelnen Felder
         double[] _felder = new double[]
         {
-            0,0.03833961,
+            
+            
+            
+            
+            0,
+            0.03833961,
             0.06101561,
             0.08522148,
             0.1099248,
@@ -69,7 +79,8 @@ namespace Scenes.Gameboard.Scripts
             0.8903697,
             0.9136136,
             0.9375497,
-            0.9642977
+            0.9642977,
+            1
         };
         /// <summary>
         /// red = 1
@@ -133,8 +144,11 @@ namespace Scenes.Gameboard.Scripts
 
             _anim = _splineUser.gameObject.GetComponent<Animator>();
             _camera = this.gameObject.GetComponentInChildren<Camera>();
+            _audioSource = this.gameObject.GetComponent<AudioSource>();
         
             aktuellePosition = 0;
+            
+            endPosition = PlayerPrefs.GetInt("EndPosition", 40);
 
             //setzt die Richtungsparameter bzw. lässt den start manuell auswählen
             //_splineFollower.autoStartPosition = false;
@@ -177,22 +191,40 @@ namespace Scenes.Gameboard.Scripts
         /// <param name="steps"> legt fest wie viele Blöcke nach vorne oder zurückgelaufen werden messen</param>
         public void Movement(int steps)
         {
+            if (aktuellePosition == 0)
+            {
+                _anim.SetTrigger("toStart");
+            }
+            
+            _audioSource.loop = true;
+            _audioSource.clip = audioClipWalking;
             // falls über oder unter die Arraygrenze kommt, schauen wie in den Regeln behandelt werden soll;
             // ob man direkt treffen muss oder solange weitergeht wie es halt geht
         
-            if (aktuellePosition + steps > _felder.Length-1)
+            if (aktuellePosition + steps > endPosition-1)
             {
-                _endOfGame = true;
-                _splineUser.SetClipRange(_felder[aktuellePosition], 1);
+                Debug.Log("End of Game Movement");
+                
+                _splineUser.SetClipRange(_felder[aktuellePosition], _felder[endPosition]);
                 _splineFollower.Restart();
                 _splineFollower.Rebuild();
-                _anim.SetBool("Walk", true);
+                
+                aktuellePosition = endPosition;
+                _positionColour = _felderColour[aktuellePosition];
+                
+                if (!_endOfGame)
+                {
+                    _anim.SetBool("Walk", true);
+                    _audioSource.Play();
+                }
+                _endOfGame = true;
+                
                 return;
             }
         
-        
             if (steps > 0)
             {
+                Debug.Log("Do Step Movement");
 
                 _splineUser.SetClipRange(_felder[aktuellePosition], _felder[aktuellePosition + steps]);
                 _splineFollower.Restart();
@@ -212,6 +244,7 @@ namespace Scenes.Gameboard.Scripts
             }
 
             _anim.SetBool("Walk", true);
+            _audioSource.Play();
 
         
 
@@ -243,6 +276,8 @@ namespace Scenes.Gameboard.Scripts
         public void EndOfMovement()
         {
             _anim.SetBool("Walk",false);
+            _audioSource.loop = false;
+            _audioSource.Stop();
         
         }
     
@@ -254,6 +289,11 @@ namespace Scenes.Gameboard.Scripts
         public int GetScore()
         {
             return _badges.GetScore();
+        }
+
+        public void MoveAway(bool b)
+        {
+            _anim.SetBool("toSide",b);
         }
     }
 }

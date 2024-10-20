@@ -199,7 +199,7 @@ public class RiddleScript : MonoBehaviour
         CollectAnswer();
         _gameController.variablenTafel.SwitchGameobjectState(true);
         Timer timer = this.gameObject.AddComponent<Timer>();
-        timer.text = _gameController.timerField;
+        timer.InitTimer(_gameController.timerField);
         //timer.StartTimer();
         //timer.timerIsRunning = true;
         _gameController.StartRiddle(_answer, timer, _abzeichen, _walkRightAnswer);

@@ -8,14 +8,22 @@ namespace XAPI.Examples
     public class XApiStatments : MonoBehaviour
     {
         private Actor actor;
+        private Actor actor2;
         private Activity activity;
         
         // Start is called before the first frame update
         private void Start()
         {
             actor = Actor.FromMailbox("mailto:example@game.com",false ,"Gruppe 1");
+            actor2 = Actor.FromMailbox("mailto:example2@game.com",false ,"Gruppe 2");
             activity = new Activity("http://game.doubleday.de", "Crabs and Turtles");
             
+            var configObject = XAPIMessenger.ConfigObject;
+            configObject.config.Endpoint = PlayerPrefs.GetString("XapiServer", "https://lrs.adlnet.gov/xapi/");
+            configObject.config.Username = PlayerPrefs.GetString("XapiKey", "xapi-tools");
+            configObject.config.Password = PlayerPrefs.GetString("XapiSecret", "xapi-tools");
+
+
             //SendSimpleStatement();
         }
 

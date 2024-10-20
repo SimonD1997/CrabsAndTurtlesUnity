@@ -4,6 +4,7 @@ using UnityEngine;
 using DTT.Rankings.Runtime;
 using UnityEngine.UI;
 using System;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 namespace Scenes.Gameboard.Scripts
@@ -283,6 +284,11 @@ namespace Scenes.Gameboard.Scripts
                 _dropdownId.options.Add(new Dropdown.OptionData() { text = rank.Id.ToString() });
 
             _dropdownId.RefreshShownValue();
+        }
+        
+        public void RestartGame()
+        {
+            SceneManager.LoadScene("Gameboard");
         }
     }
 }

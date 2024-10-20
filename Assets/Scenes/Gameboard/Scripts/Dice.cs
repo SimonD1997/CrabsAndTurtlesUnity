@@ -5,7 +5,7 @@ using Random = UnityEngine.Random;
 
 namespace Scenes.Gameboard.Scripts
 {
-    public class Diece : MonoBehaviour
+    public class Dice : MonoBehaviour
     {
         
         private Rigidbody rb;
@@ -98,10 +98,10 @@ namespace Scenes.Gameboard.Scripts
                  if (_diceNumber == 0)
                  {
                      rb.mass = 1;
-                     yield return new WaitForSeconds(0.2f);
+                     yield return new WaitForSeconds(0.5f);
                      rb.mass = 5000;
                      rb.AddForce(Vector3.forward * 2000, ForceMode.Impulse);
-                     rb.AddTorque(Vector3.right*5, ForceMode.Impulse);
+                     rb.AddTorque(Vector3.right*10, ForceMode.Impulse);
                  }
                 yield return _diceNumber;
                 

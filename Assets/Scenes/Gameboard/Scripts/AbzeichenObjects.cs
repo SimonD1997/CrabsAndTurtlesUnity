@@ -9,7 +9,9 @@ namespace Scenes.Gameboard.Scripts
         public Sprite[] _spriteList;
         public List<Sprite> _Sprites;
         private Sprite _sprite;
-        public int _count = 1;
+        private bool _semiTransparent = true;
+        
+        public int _count = 0;
 
         public int GetAbzeichenNumber()
         {
@@ -35,6 +37,12 @@ namespace Scenes.Gameboard.Scripts
         public Sprite GetSprite()
         {
             return _sprite;
+        }
+
+        public bool GetSetTransparent(bool transparent)
+        {
+            _semiTransparent = transparent;
+            return _semiTransparent;
         }
 
 

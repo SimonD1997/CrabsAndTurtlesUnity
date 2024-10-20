@@ -42,9 +42,11 @@ namespace Scenes.Gameboard.Scripts
         public MovementScript movementScript;
         private MovementScript lastMovementScript;
         public Abzeichen abzeichen;
+        private Abzeichen shownBadges;
         public VariablenTafel variablenTafel;
 
         public GameObject inventory;
+        private Inventory _inventoryScript;
         public GameObject mainMenu;
 
         public List<MovementScript> playerMovements;
@@ -57,6 +59,10 @@ namespace Scenes.Gameboard.Scripts
         public Camera m_camera;
 
         private Timer _timer;
+        
+        public AudioClip endOfTimerSound;
+        private AudioSource _audioSource;
+        
         private int _correctAnswer;
         public bool inputFieldEnter = false;
         public TMP_InputField inputField;
@@ -101,9 +107,11 @@ namespace Scenes.Gameboard.Scripts
             startingPlayer = playerTurn;
             
             movementScript = playerMovements[playerTurn];
-            lastMovementScript = movementScript;
+            lastMovementScript = playerMovements[(playerTurn+1)%2];
+            Debug.Log(movementScript.gameObject.name + "  &  " + lastMovementScript.gameObject.name);
             
             abzeichen = movementScript.gameObject.GetComponent<Abzeichen>();
+            shownBadges = abzeichen;
             // Warum auch immer gibt es Nullpointer exeptions TODO. Herausfinden warum... 
             abzeichen.ShowAbzeichen();
         }
@@ -124,7 +132,10 @@ namespace Scenes.Gameboard.Scripts
             _cardList = new List<GameObject>();
             _riddleCardList = new List<GameObject>();
             _abzeichenList = new List<int>();
-            
+
+            _inventoryScript = inventory.GetComponent<Inventory>();
+
+            _audioSource = this.gameObject.GetComponent<AudioSource>();
             
             //_cardStack = new GameObject[5];
             CardStack();
@@ -142,9 +153,6 @@ namespace Scenes.Gameboard.Scripts
                 else
                 {
                     mainMenu.SetActive(true);
-                }
-                {
-                    
                 }
             }
             
@@ -177,25 +185,33 @@ namespace Scenes.Gameboard.Scripts
                     {
                         if (nextMove == 1)
                         {
-                            inputField.text = "Dies war die falsche Angabe oder die der anderen Figur! Du darfst "+ nextMove + " Schritt vor gehen!";
+                            timerField.text = "Dies war die falsche Angabe oder die der anderen Figur! Du darfst "+ nextMove + " Schritt vor gehen!";
                         }
                         else
                         {
-                            inputField.text = "Dies war die falsche Angabe oder die der anderen Figur! Du darfst "+ nextMove + " Schritte vor gehen!";
+                            timerField.text = "Dies war die falsche Angabe oder die der anderen Figur! Du darfst "+ nextMove + " Schritte vor gehen!";
                         }
                         
+                    }
+                    var otherPosition = lastMovementScript.GetPosition();
+                    var position = movementScript.GetPosition();
+                    if (position < otherPosition && otherPosition <= position + nextMove)
+                    {
+                        lastMovementScript.MoveAway(true);
                     }
                     this.movementScript.Movement(nextMove);
 
                     nextMove = 0;
                     //inputField.text = "";
                     inputFieldEnter = false;
+                    //StartCoroutine(WaiterToEndOfMove());
+                    
+                    //TODO checken ob auch die Karte mit dem weiterkaufen funktioniert. Bzw. bei falscher Eingabe 
+                    // sollte der Text noch länger da stehen
                 }
             }
             else
             {
-                //todo:
-                //run endscreen with scoreboard
               
                 this.movementScript.SetCameraActiv(false);
                 this.inventory.gameObject.SetActive(false);
@@ -222,6 +238,7 @@ namespace Scenes.Gameboard.Scripts
         /// </summary>
         void NextPlayer()
         {
+            
             if (endOfGame)
             {
                 EndGame();
@@ -274,6 +291,20 @@ namespace Scenes.Gameboard.Scripts
         {
             inputFieldEnter = true;
         }
+
+        public void SwitchInventory()
+        {
+            if (shownBadges == abzeichen)
+            {
+                Debug.Log("Switch to"+lastMovementScript.gameObject.name);
+                shownBadges = lastMovementScript.gameObject.GetComponent<Abzeichen>();
+            }
+            else
+            {
+                shownBadges = abzeichen;
+            }
+            shownBadges.ShowAbzeichen();
+        }
         
         /// <summary>
         /// Ends the game and displays the scoreboard with final scores.
@@ -310,33 +341,34 @@ namespace Scenes.Gameboard.Scripts
                 Rank rank1 = new Rank(1, "CRAB", player1Score);
                 Rank rank2 = new Rank(2, "TURTLE", player2Score);
                 Rank[] rows = { rank1, rank2 };
-                
-                
+
+
                 if (playerMovements[0].GetEndOfGame() && playerMovements[1].GetEndOfGame())
                 {
                     if (player1Score > player2Score)
                     {
                         winner = playerMovements[0];
+                        winnerID = 1;
                     }
                     else if (player2Score > player1Score)
                     {
                         winner = playerMovements[1];
-                    }else if (player1Score == player2Score)
+                        winnerID = 2;
+                    }
+                    else if (player1Score == player2Score)
                     {
                         // Both players have the same score
                         Debug.Log("Both players have the same score.");
                     }
-                    
+
                     // Both players have reached the end of the game
                     Debug.Log("Both players have reached the end of the game.");
-                }
-                else if (playerMovements[0].GetEndOfGame())
+                }else if (playerMovements[0].GetEndOfGame())
                 {
                     winner = playerMovements[0];
                     winnerID = 1;
 
-                }
-                else if (playerMovements[1].GetEndOfGame())
+                }else if (playerMovements[1].GetEndOfGame())
                 {
                     winner = playerMovements[1];
                     winnerID = 2;
@@ -357,6 +389,7 @@ namespace Scenes.Gameboard.Scripts
                     scoreboardText.text = "Unentschieden!";
                 }
                
+                StopAllCoroutines();
 
                 Debug.Log("Game ended. Final scores displayed.");
             }
@@ -404,15 +437,24 @@ namespace Scenes.Gameboard.Scripts
                 this._diceNumber = diceNumber;
                 
                 //Camera from player enabled
-                lastMovementScript = movementScript;
-                lastMovementScript.SetCameraActiv(true);
+               
+                movementScript.SetCameraActiv(true);
+                var otherPosition = lastMovementScript.GetPosition();
+                var position = movementScript.GetPosition();
+                if (position < otherPosition && otherPosition <= position + diceNumber)
+                {
+                    lastMovementScript.MoveAway(true);
+                }
+                movementScript.MoveAway(false);
                 this.movementScript.Movement(diceNumber);
                 _gameState = 1;
 
-                if (movementScript.GetEndOfGame())
+                //TODO is this part needed?
+                 //lastMovementScript = movementScript;
+                /*if (movementScript.GetEndOfGame())
                 {
                     EndGame();
-                }
+                }*/
                 
                 this.abzeichen.ShowAbzeichen();
             
@@ -475,17 +517,18 @@ namespace Scenes.Gameboard.Scripts
             confirmButtonText.text = "";
             inputField.interactable = false;
             inputFieldPlaceholder.text = "";
-            timerField.text = "";
+            
+            //TODO Wenn hier schon dann wird der Text beim nur laufen auf der Karte nicht angezeigt
+            //timerField.text = "";
             
             _diceNumber = 0;
             
             yield return new WaitForSeconds(2);
-
-            inputField.text = "";
-            timerField.text = "";
+            
 
             if (secondPlayer)
             {
+                inputField.text = "";
                 _gameState = 0;
             }
             
@@ -504,9 +547,21 @@ namespace Scenes.Gameboard.Scripts
                         confirmButtonText.text = "";
                         confirmButton.interactable = false;
                         
+                        timerField.text = "";
+                        
+                        inputField.text = "";
+                        
+                        abzeichen.HidePopUp();
+                        
+                        //If the game ends after the move
+                        if (movementScript.GetEndOfGame())
+                        {
+                            EndGame();
+                            yield break;
+                        }
+                        
                         NextPlayer();
                         
-                        timerField.text = "";
                         yield break;
                     }
                 
@@ -581,7 +636,9 @@ namespace Scenes.Gameboard.Scripts
         public void StartRiddle(int correctAnswer, Timer timer, List<int> abzeichenList, int walkRightAnswer)
         {
             _riddleCardState = true;
-            this.lastMovementScript = this.movementScript;
+            
+            //TODO: is this needed?
+            //this.lastMovementScript = this.movementScript;
             
             inputFieldPlaceholder.text = "Eingabefeld";
             inputField.interactable = true;
@@ -600,7 +657,7 @@ namespace Scenes.Gameboard.Scripts
             _timer.SetTimerText("Timer: ");
             _timer.timeRemaining = 30;
             //_timer.text = this.timerField;
-            _timer.StartTimer();
+            _timer.StartTimer(true);
             
             movementScript.GetAnimator().SetInteger("Face",3);
             
@@ -637,6 +694,12 @@ namespace Scenes.Gameboard.Scripts
                 movementScript.GetAnimator().SetInteger("Face",1);
                 
                 //movement of player
+                var otherPosition = lastMovementScript.GetPosition();
+                var position = movementScript.GetPosition();
+                if (position < otherPosition && otherPosition <= position + nextMove)
+                {
+                    lastMovementScript.MoveAway(true);
+                }
                 this.movementScript.Movement(nextMove);
                 nextMove = 0;
                 
@@ -668,6 +731,8 @@ namespace Scenes.Gameboard.Scripts
             }
             else 
             {
+                
+                
                 Debug.Log("wrong Answer");
                 inputField.text = "Falsche Antwort";
                 movementScript.GetAnimator().SetInteger("Face",4);
@@ -675,6 +740,7 @@ namespace Scenes.Gameboard.Scripts
                 if (firstTry)
                 {
                     NextPlayer();
+                    movementScript.GetAnimator().SetInteger("Face",3);
                     StartCoroutine(Waiter2());  
                 }
                 else
@@ -717,7 +783,9 @@ namespace Scenes.Gameboard.Scripts
             {
                 if (inputFieldEnter)
                 {
+                    _audioSource.PlayOneShot(endOfTimerSound);
                     _timer.StopTimer();
+                    
 
                     confirmButton.interactable = false;
                     confirmButtonEnter = false;
@@ -726,6 +794,9 @@ namespace Scenes.Gameboard.Scripts
                 } 
                 yield return null;
             }
+            //TODO play Sound to mark the end of the timer
+            _audioSource.PlayOneShot(endOfTimerSound);
+            
             confirmButton.interactable = false;
             confirmButtonEnter = false;
             CheckAnswer(true);
@@ -739,7 +810,7 @@ namespace Scenes.Gameboard.Scripts
             _timer.SetTimerText("Zeit zum weitergeben: ");
             _timer.timeRemaining = 5;
             inputField.text = "Falsche Antwort! Das andere Team bekommt die Chance!";
-            _timer.StartTimer();
+            _timer.StartTimer(false);
             
             yield return new WaitForSeconds(5);
             
@@ -748,8 +819,8 @@ namespace Scenes.Gameboard.Scripts
             inputFieldEnter = false;
             _timer.SetTimerText("Timer: ");
             _timer.timeRemaining = 30;
-            _timer.StartTimer();
-            movementScript.GetAnimator().SetInteger("Face",4);
+            _timer.StartTimer(true);
+            movementScript.GetAnimator().SetInteger("Face",3);
             
             Debug.Log("correct Answer:" + _correctAnswer);
             
@@ -757,6 +828,7 @@ namespace Scenes.Gameboard.Scripts
             {
                 if (inputFieldEnter)
                 {
+                    _audioSource.PlayOneShot(endOfTimerSound);
                     _timer.StopTimer();
                     
                     confirmButton.interactable = false;
@@ -768,6 +840,7 @@ namespace Scenes.Gameboard.Scripts
                 } 
                 yield return null;
             }
+            _audioSource.PlayOneShot(endOfTimerSound);
             
             confirmButton.interactable = false;
             confirmButtonEnter = true;
@@ -791,8 +864,12 @@ namespace Scenes.Gameboard.Scripts
 
                     if (_newColourNumber == variablenTafel.GetVar(movementScript.GetPositionColour()))
                     {
-                        inputField.text = "Richtige Antwort!";
+                        timerField.text = "Richtige Antwort!";
                         movementScript.GetAnimator().SetInteger("Face",1);
+                    }else
+                    {
+                        timerField.text = "Falsche Antwort!";
+                        movementScript.GetAnimator().SetInteger("Face",4);
                     }
                     
                     if (_corectionTimes == 1)
@@ -812,7 +889,7 @@ namespace Scenes.Gameboard.Scripts
                     _gameState = 3;
                     _actionCardState = false;
                     
-                    timerField.text = "";
+                    inputField.text = "";
                     _corectionTimes = 1;
 
                     //Karten vom Stapel nehmen, wenn die Karte umgedreht ist.
@@ -835,13 +912,6 @@ namespace Scenes.Gameboard.Scripts
                     
                     yield break;
 
-                }else if (confirmButtonEnter)
-                {
-                    timerField.text =
-                        "Falscher Spielzug: Überprüfe die Variablentafel! Du hast eine korrektur Möglichkeit!";
-                    movementScript.GetAnimator().SetInteger("Face",2);
-                    _corectionTimes -= 1;
-                    confirmButtonEnter = false;
                 }else if (_newColourNumber == -999 && nextMove == 0)
                 {
                     //abzeichen.AddAbzeichen(_abzeichenList);
@@ -851,12 +921,14 @@ namespace Scenes.Gameboard.Scripts
                     confirmButtonEnter = false;
                     StartCoroutine(WaiterToEndOfMove());
                     
+                    inputField.text = "";
+                    inputFieldPlaceholder.text = "";
+                    
+                    
                     this.lastMovementScript.SetCameraActiv(false);
                     
                     
                     _actionCardState = false;
-                    inputField.text = "";
-                    inputFieldPlaceholder.text = "";
                     
                     //Karten vom Stapel nehmen, wenn die Karte umgedreht ist.
                     GameObject tempCard = this._cardList[0].gameObject;
@@ -869,6 +941,14 @@ namespace Scenes.Gameboard.Scripts
                     
                     
                     yield break;
+                }
+                else if (confirmButtonEnter)
+                {
+                    timerField.text =
+                        "Falscher Spielzug: Überprüfe die Variablentafel! Du hast eine korrektur Möglichkeit!";
+                    movementScript.GetAnimator().SetInteger("Face",2);
+                    _corectionTimes -= 1;
+                    confirmButtonEnter = false;
                 }
 
                 yield return null;

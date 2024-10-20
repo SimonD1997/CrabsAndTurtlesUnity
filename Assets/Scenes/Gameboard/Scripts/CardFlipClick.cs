@@ -10,6 +10,7 @@ public class CardFlipClick : MonoBehaviour
 {
     Camera m_Camera;
     private Animator _anim;
+    private AudioSource _audioSource;
     private Collider _collider;
     private bool _down = true;
     private GameController _gameController;
@@ -25,6 +26,7 @@ public class CardFlipClick : MonoBehaviour
         _collider = this.gameObject.GetComponent<Collider>();
         _anim = this.gameObject.GetComponent<Animator>();
         _gameController = FindFirstObjectByType<GameController>();
+        _audioSource = this.gameObject.GetComponent<AudioSource>();
 
         //this.gameObject.GetComponent<Animator>().enabled = false;
     }
@@ -42,6 +44,7 @@ public class CardFlipClick : MonoBehaviour
             {
                 _anim.enabled = true;
                 _anim.SetTrigger("Klick"); 
+                _audioSource.Play();
                 _down = false;
 
 
