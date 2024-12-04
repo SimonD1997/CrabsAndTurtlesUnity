@@ -1,22 +1,21 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
+using XAPI;
 
-namespace XAPI.Examples
+namespace Unity_xAPI_Wrapper_master.Examples.Scripts
 {
     public class XApiStatments : MonoBehaviour
     {
-        private Actor actor;
-        private Actor actor2;
-        private Activity activity;
+        private Actor _actor;
+        private Actor _actor2;
+        private Activity _activity;
         
         // Start is called before the first frame update
         private void Start()
         {
-            actor = Actor.FromMailbox("mailto:example@game.com",false ,"Gruppe 1");
-            actor2 = Actor.FromMailbox("mailto:example2@game.com",false ,"Gruppe 2");
-            activity = new Activity("http://game.doubleday.de", "Crabs and Turtles");
+            _actor = Actor.FromMailbox("mailto:example@game.com",false ,"Gruppe 1");
+            _actor2 = Actor.FromMailbox("mailto:example2@game.com",false ,"Gruppe 2");
+            _activity = new Activity("http://game.doubleday.de", "Crabs and Turtles");
             
             var configObject = XAPIMessenger.ConfigObject;
             configObject.config.Endpoint = PlayerPrefs.GetString("XapiServer", "https://lrs.adlnet.gov/xapi/");
@@ -30,7 +29,7 @@ namespace XAPI.Examples
         public void SendSimpleStatement(Verb verb)
         {
 
-            var statement = new Statement(actor, verb, activity);
+            var statement = new Statement(_actor, verb, _activity);
 
             XAPIWrapper.SendStatement(statement, res => {
                 Debug.Log("Sent simple statement!  LRS stored with ID: " + res.StatementID); 
@@ -56,7 +55,7 @@ namespace XAPI.Examples
         {
             var verb = Verbs.Initialized;
             
-            var statement = new Statement(actor, verb, activity);
+            var statement = new Statement(_actor, verb, _activity);
 
             XAPIWrapper.SendStatement(statement, res => {
                 Debug.Log("Sent simple statement!  LRS stored with ID: " + res.StatementID); 

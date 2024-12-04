@@ -181,11 +181,19 @@ namespace Scenes.Gameboard.Scripts
 
                 if (inputFieldEnter == true && nextMove > 0 && _actionCardState == true)
                 {
-                    if (Convert.ToInt32(inputField.text) != nextMove)
+                    int input = 0;
+                    if (!string.IsNullOrEmpty(inputField.text))
+                    {
+                        Debug.LogError("Input is empty!");
+                        input = Convert.ToInt32(inputField.text);
+
+                    }
+                    
+                    if (input != nextMove)
                     {
                         if (nextMove == 1)
                         {
-                            timerField.text = "Dies war die falsche Angabe oder die der anderen Figur! Du darfst "+ nextMove + " Schritt vor gehen!";
+                            timerField.text = "Dies war die falsche Angabe oder die der anderen Figur! Du darfst 1 Schritt vor gehen!";
                         }
                         else
                         {
@@ -206,7 +214,7 @@ namespace Scenes.Gameboard.Scripts
                     inputFieldEnter = false;
                     //StartCoroutine(WaiterToEndOfMove());
                     
-                    //TODO checken ob auch die Karte mit dem weiterkaufen funktioniert. Bzw. bei falscher Eingabe 
+                    //TODO checken ob auch die Karte mit dem weiterlaufen funktioniert. Bzw. bei falscher Eingabe 
                     // sollte der Text noch länger da stehen
                 }
             }
