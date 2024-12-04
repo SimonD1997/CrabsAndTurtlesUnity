@@ -71,16 +71,11 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
+
+
+
 Assets/SyntyStudios/
-
-Assets/DTT/
-
-Assets/Free RPG Icons/
 
 Assets/OvaniAmbiencePlugin/
 
-Assets/Thirdparty/Ciathyza/
-
-Assets/VisualX_Studio/App_UI_Icon_animation_FREE/Demo/
-
-Assets/VisualX_Studio/App_UI_Icon_animation_FREE/VFX/Textures/
+Assets/VisualX_Studio/App_UI_Icon_animation_FREE/
