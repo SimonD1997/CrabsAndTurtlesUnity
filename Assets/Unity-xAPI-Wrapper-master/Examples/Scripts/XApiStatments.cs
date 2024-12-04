@@ -6,14 +6,14 @@ namespace Unity_xAPI_Wrapper_master.Examples.Scripts
 {
     public class XApiStatments : MonoBehaviour
     {
-        private Actor _actor;
-        private Actor _actor2;
+        private static Actor _actor;
+        private static Actor _actor2;
         private Activity _activity;
         
         // Start is called before the first frame update
         private void Start()
         {
-            _actor = Actor.FromMailbox("mailto:example@game.com",false ,"Gruppe 1");
+           _actor = Actor.FromMailbox("mailto:example@game.com",false , "Gruppe 1");
             _actor2 = Actor.FromMailbox("mailto:example2@game.com",false ,"Gruppe 2");
             _activity = new Activity("http://game.doubleday.de", "Crabs and Turtles");
             
@@ -28,6 +28,7 @@ namespace Unity_xAPI_Wrapper_master.Examples.Scripts
 
         public void SendSimpleStatement(Verb verb)
         {
+            var _actor = Actor.FromMailbox("mailto:example@game.com",false , "Gruppe 1");
 
             var statement = new Statement(_actor, verb, _activity);
 
@@ -53,9 +54,11 @@ namespace Unity_xAPI_Wrapper_master.Examples.Scripts
         
         public void SendSimpleStatement()
         {
-            var verb = Verbs.Initialized;
-            
-            var statement = new Statement(_actor, verb, _activity);
+            var actor = Actor.FromAccount("https://auth.example.com", "some-long-user-id", name: "some-user-name");
+            var verb = Verbs.Interacted;
+            var activity = new Activity("https://lms.example.com", "Unity Button Example");
+
+            var statement = new Statement(actor, verb, activity);
 
             XAPIWrapper.SendStatement(statement, res => {
                 Debug.Log("Sent simple statement!  LRS stored with ID: " + res.StatementID); 

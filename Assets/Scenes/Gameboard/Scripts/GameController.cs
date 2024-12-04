@@ -85,7 +85,33 @@ namespace Scenes.Gameboard.Scripts
         public LeaderboardUI _leaderboardUI;
         
 
+        private void Awake()
+        {
+            SetHorizontalFieldOfView(90);
+            
+            _cardList = new List<GameObject>();
+            _riddleCardList = new List<GameObject>();
+            _abzeichenList = new List<int>();
 
+            _inventoryScript = inventory.GetComponent<Inventory>();
+
+            _audioSource = this.gameObject.GetComponent<AudioSource>();
+            
+            //_cardStack = new GameObject[5];
+            CardStack();
+            
+        }
+        
+        /// <summary>
+        /// Sets the horizontal field of view for the camera.
+        /// </summary>
+        /// <param name="horizontalFOV">The desired horizontal field of view in degrees.</param>
+        private void SetHorizontalFieldOfView(float horizontalFOV)
+        {
+            float verticalFOV = 2 * Mathf.Atan(Mathf.Tan(horizontalFOV * Mathf.Deg2Rad / 2) / m_camera.aspect) * Mathf.Rad2Deg;
+            m_camera.fieldOfView = verticalFOV;
+        }
+        
         // Start is called before the first frame update
         void Start()
         {
@@ -115,33 +141,38 @@ namespace Scenes.Gameboard.Scripts
             // Warum auch immer gibt es Nullpointer exeptions TODO. Herausfinden warum... 
             abzeichen.ShowAbzeichen();
         }
+        
         /// <summary>
-        /// Sets the horizontal field of view for the camera.
+        /// Initializes the card stack.
         /// </summary>
-        /// <param name="horizontalFOV">The desired horizontal field of view in degrees.</param>
-        private void SetHorizontalFieldOfView(float horizontalFOV)
+        private void CardStack()
         {
-            float verticalFOV = 2 * Mathf.Atan(Mathf.Tan(horizontalFOV * Mathf.Deg2Rad / 2) / m_camera.aspect) * Mathf.Rad2Deg;
-            m_camera.fieldOfView = verticalFOV;
+            
+            for (int i = 0; i < 5; i++)
+            {
+                GameObject tempCard = Instantiate(riddleCardPrefab, new Vector3(-35, -23, i), riddleCardPrefab.transform.rotation);
+                //tempCard.transform.rotation.Set(89,0,0,0 );
+                tempCard.GetComponentInChildren<SpriteRenderer>().sprite = riddlePrefabStack[Random.Range(0,riddlePrefabStack.Length)];
+                //this._cardStack[i] = tempCard;
+                //Karte dort runternehmen und dann den Stapel von unten auffüllen
+                _riddleCardList.Add(tempCard);
+            }
+            for (int i = 0; i < 5; i++)
+            {
+                GameObject tempCard = Instantiate(cardPrefab, new Vector3(-35, -7, i), riddleCardPrefab.transform.rotation);
+                tempCard.GetComponentInChildren<SpriteRenderer>().sprite = cardPrefabStack[Random.Range(0,cardPrefabStack.Length)];
+                _cardList.Add(tempCard);
+            }
+            
+            //GameObject tempCard2 = this._cardList[4];
+            //tempCard2.GetComponent<CardFlipClick>().enabled = true;
+            _riddleCardList[0].gameObject.GetComponent<CardFlipClick>().enabled = true;
+            //_riddleCardList[0].gameObject.GetComponent<Animator>().enabled = true;
+            _cardList[0].gameObject.GetComponent<CardFlipClick>().enabled = true;
+            //_cardList[0].gameObject.GetComponent<Animator>().enabled = true;
         }
         
-        private void Awake()
-        {
-            SetHorizontalFieldOfView(90);
-            
-            _cardList = new List<GameObject>();
-            _riddleCardList = new List<GameObject>();
-            _abzeichenList = new List<int>();
-
-            _inventoryScript = inventory.GetComponent<Inventory>();
-
-            _audioSource = this.gameObject.GetComponent<AudioSource>();
-            
-            //_cardStack = new GameObject[5];
-            CardStack();
-            
-        }
-
+        
         // Update is called once per frame
         void Update()
         {
@@ -232,8 +263,7 @@ namespace Scenes.Gameboard.Scripts
             }
             
         }
-
-
+        
         void TurnOfOtherPlayers()
         {
             //todo:
@@ -425,7 +455,7 @@ namespace Scenes.Gameboard.Scripts
             return this._diceNumber;
         }
         
-        // <summary>
+        
         /// Sets the dice number. And starts the movement of the player.
         /// Also flips cards if they are turned and removes them from the stack.
         /// </summary>
@@ -500,147 +530,10 @@ namespace Scenes.Gameboard.Scripts
             }
             
         }
-        /// <summary>
-        /// Coroutine to animate the card flip and destroy the card after a delay.
-        /// </summary>
-        /// <param name="tempCard">The card to animate and destroy.</param>
-        /// <returns>An IEnumerator for the coroutine.</returns>
-        IEnumerator WaiterAnimator(GameObject tempCard)
-        {
-            yield return new WaitForSeconds(0.5f);
-            tempCard.GetComponent<CardFlipClick>().ClickStateActivate();
-            yield return new WaitForSeconds(5);
-            Destroy(tempCard);
-            
-        }
-        /// <summary>
-        /// Coroutine to handle the end of a move.
-        /// </summary>
-        /// <returns>An IEnumerator for the coroutine.</returns>
-        IEnumerator WaiterToEndOfMove()
-        {
-            
-            bool secondPlayer = confirmButtonEnter == true;
-            confirmButtonEnter = false;
-            confirmButtonText.text = "";
-            inputField.interactable = false;
-            inputFieldPlaceholder.text = "";
-            
-            //TODO Wenn hier schon dann wird der Text beim nur laufen auf der Karte nicht angezeigt
-            //timerField.text = "";
-            
-            _diceNumber = 0;
-            
-            yield return new WaitForSeconds(2);
-            
-
-            if (secondPlayer)
-            {
-                inputField.text = "";
-                _gameState = 0;
-            }
-            
-            if (secondPlayer == false)
-            {
-                
-                confirmButton.interactable = true;
-                confirmButtonText.text = "Spielzug beenden";
-                
-                while (true)
-                {
-                    if (confirmButtonEnter)
-                    {
-                        _gameState = 0;
-                        
-                        confirmButtonText.text = "";
-                        confirmButton.interactable = false;
-                        
-                        timerField.text = "";
-                        
-                        inputField.text = "";
-                        
-                        abzeichen.HidePopUp();
-                        
-                        //If the game ends after the move
-                        if (movementScript.GetEndOfGame())
-                        {
-                            EndGame();
-                            yield break;
-                        }
-                        
-                        NextPlayer();
-                        
-                        yield break;
-                    }
-                
-                    yield return null;
-                }
-                
-            }
-            
-            
-        }
-        /// <summary>
-        /// Initializes the card stack.
-        /// </summary>
-        private void CardStack()
-        {
-            
-            for (int i = 0; i < 5; i++)
-            {
-                GameObject tempCard = Instantiate(riddleCardPrefab, new Vector3(-35, -23, i), riddleCardPrefab.transform.rotation);
-                //tempCard.transform.rotation.Set(89,0,0,0 );
-                tempCard.GetComponentInChildren<SpriteRenderer>().sprite = riddlePrefabStack[Random.Range(0,riddlePrefabStack.Length)];
-                //this._cardStack[i] = tempCard;
-                //Karte dort runternehmen und dann den Stapel von unten auffüllen
-                _riddleCardList.Add(tempCard);
-            }
-            for (int i = 0; i < 5; i++)
-            {
-                GameObject tempCard = Instantiate(cardPrefab, new Vector3(-35, -7, i), riddleCardPrefab.transform.rotation);
-                tempCard.GetComponentInChildren<SpriteRenderer>().sprite = cardPrefabStack[Random.Range(0,cardPrefabStack.Length)];
-                _cardList.Add(tempCard);
-            }
-            
-            //GameObject tempCard2 = this._cardList[4];
-            //tempCard2.GetComponent<CardFlipClick>().enabled = true;
-            _riddleCardList[0].gameObject.GetComponent<CardFlipClick>().enabled = true;
-            //_riddleCardList[0].gameObject.GetComponent<Animator>().enabled = true;
-            _cardList[0].gameObject.GetComponent<CardFlipClick>().enabled = true;
-            //_cardList[0].gameObject.GetComponent<Animator>().enabled = true;
-        }
-        /// <summary>
-        /// Moves the cards up in the stack.
-        /// </summary>
-        /// <param name="cardList">The list of cards to move up.</param>
-        private void MoveCardsUp(List<GameObject> cardList)
-        {
-            foreach (var o in cardList)
-            {
-                Vector3 tempVector = o.transform.position;
-                Debug.Log(tempVector);
-                tempVector.z = o.transform.position.z - 1;
-                o.transform.position = tempVector;
-                Debug.Log(tempVector);
-            }
-            cardList[0].gameObject.GetComponent<CardFlipClick>().enabled = true;
-            
-        }
-        /// <summary>
-        /// Adds a card to the stack.
-        /// </summary>
-        /// <param name="cardList">The list of cards to add to.</param>
-        /// <param name="prefab">The card prefab to instantiate.</param>
-        /// <param name="spriteStack">The array of sprites to choose from.</param>
-        /// <param name="yPosition">The y position to place the card at.</param>
-        private void AddCardStack(List<GameObject> cardList, GameObject prefab, Sprite[] spriteStack,int yPosition)
-        {
-            GameObject tempCard = Instantiate(prefab, new Vector3(-35, yPosition, 4), riddleCardPrefab.transform.rotation);
-            tempCard.GetComponentInChildren<SpriteRenderer>().sprite = spriteStack[Random.Range(0,spriteStack.Length)];
-            cardList.Add(tempCard);
-           
-        }
-
+        
+        
+        // Scripts to handle RiddleCards
+        
         public void StartRiddle(int correctAnswer, Timer timer, List<int> abzeichenList, int walkRightAnswer)
         {
             _riddleCardState = true;
@@ -674,24 +567,7 @@ namespace Scenes.Gameboard.Scripts
             StartCoroutine(Waiter());
             
         }
-
-        public void ActionCard(int newColourNumber,List<int> abzeichenList)
-        {
-            inputFieldEnter = false;
-            //inputFieldPlaceholder.text = ""; set in class ActionCard
-            _newColourNumber = newColourNumber;
-            _actionCardState = true;
-            _abzeichenList = abzeichenList;
-            
-            variablenTafel.SwitchInputFields(true);
-            
-            confirmButton.interactable = true;
-            confirmButtonText.text = "Eingabe bestätigen";
-            
-            StartCoroutine(Waiter3());
-
-        }
-
+        
         void CheckAnswer(bool firstTry)
         {
             
@@ -782,6 +658,7 @@ namespace Scenes.Gameboard.Scripts
             }
             
         }
+        
         IEnumerator Waiter()
         {
             
@@ -857,7 +734,27 @@ namespace Scenes.Gameboard.Scripts
             //abzeichen.ShowAbzeichen();
             
         }
+        
+        
+        //Scripts to handle ActionCards
+        
+        public void ActionCard(int newColourNumber,List<int> abzeichenList)
+        {
+            inputFieldEnter = false;
+            //inputFieldPlaceholder.text = ""; set in class ActionCard
+            _newColourNumber = newColourNumber;
+            _actionCardState = true;
+            _abzeichenList = abzeichenList;
+            
+            variablenTafel.SwitchInputFields(true);
+            
+            confirmButton.interactable = true;
+            confirmButtonText.text = "Eingabe bestätigen";
+            
+            StartCoroutine(Waiter3());
 
+        }
+        
         IEnumerator Waiter3()
         {
             confirmButtonEnter = false;
@@ -961,6 +858,125 @@ namespace Scenes.Gameboard.Scripts
 
                 yield return null;
             }
+        }
+        
+        
+        // End of Move 
+        
+        /// <summary>
+        /// Coroutine to animate the card flip and destroy the card after a delay.
+        /// </summary>
+        /// <param name="tempCard">The card to animate and destroy.</param>
+        /// <returns>An IEnumerator for the coroutine.</returns>
+        IEnumerator WaiterAnimator(GameObject tempCard)
+        {
+            yield return new WaitForSeconds(0.5f);
+            tempCard.GetComponent<CardFlipClick>().ClickStateActivate();
+            yield return new WaitForSeconds(5);
+            Destroy(tempCard);
+            
+        }
+        
+        /// <summary>
+        /// Moves the cards up in the stack.
+        /// </summary>
+        /// <param name="cardList">The list of cards to move up.</param>
+        private void MoveCardsUp(List<GameObject> cardList)
+        {
+            foreach (var o in cardList)
+            {
+                Vector3 tempVector = o.transform.position;
+                Debug.Log(tempVector);
+                tempVector.z = o.transform.position.z - 1;
+                o.transform.position = tempVector;
+                Debug.Log(tempVector);
+            }
+            cardList[0].gameObject.GetComponent<CardFlipClick>().enabled = true;
+            
+        }
+        
+        /// <summary>
+        /// Adds a card to the stack.
+        /// </summary>
+        /// <param name="cardList">The list of cards to add to.</param>
+        /// <param name="prefab">The card prefab to instantiate.</param>
+        /// <param name="spriteStack">The array of sprites to choose from.</param>
+        /// <param name="yPosition">The y position to place the card at.</param>
+        private void AddCardStack(List<GameObject> cardList, GameObject prefab, Sprite[] spriteStack,int yPosition)
+        {
+            GameObject tempCard = Instantiate(prefab, new Vector3(-35, yPosition, 4), riddleCardPrefab.transform.rotation);
+            tempCard.GetComponentInChildren<SpriteRenderer>().sprite = spriteStack[Random.Range(0,spriteStack.Length)];
+            cardList.Add(tempCard);
+           
+        }
+        
+        
+        /// <summary>
+        /// Coroutine to handle the end of a move.
+        /// </summary>
+        /// <returns>An IEnumerator for the coroutine.</returns>
+        IEnumerator WaiterToEndOfMove()
+        {
+            
+            bool secondPlayer = confirmButtonEnter == true;
+            confirmButtonEnter = false;
+            confirmButtonText.text = "";
+            inputField.interactable = false;
+            inputFieldPlaceholder.text = "";
+            
+            //TODO Wenn hier schon dann wird der Text beim nur laufen auf der Karte nicht angezeigt
+            //timerField.text = "";
+            
+            _diceNumber = 0;
+            
+            yield return new WaitForSeconds(2);
+            
+
+            if (secondPlayer)
+            {
+                inputField.text = "";
+                _gameState = 0;
+            }
+            
+            if (secondPlayer == false)
+            {
+                
+                confirmButton.interactable = true;
+                confirmButtonText.text = "Spielzug beenden";
+                
+                while (true)
+                {
+                    if (confirmButtonEnter)
+                    {
+                        _gameState = 0;
+                        
+                        confirmButtonText.text = "";
+                        confirmButton.interactable = false;
+                        
+                        timerField.text = "";
+                        
+                        inputField.text = "";
+                        
+                        abzeichen.HidePopUp();
+                        
+                        //If the game ends after the move
+                        if (movementScript.GetEndOfGame())
+                        {
+                            EndGame();
+                            yield break;
+                        }
+                        
+                        NextPlayer();
+                        
+                        yield break;
+                    }
+                
+                    yield return null;
+                }
+                
+            }
+            
+            
         }
     }
 }
