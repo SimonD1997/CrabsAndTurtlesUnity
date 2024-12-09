@@ -7,8 +7,8 @@ PhysicMaterial:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: DiceMaterial
-  dynamicFriction: 0.04
-  staticFriction: 0.01
+  dynamicFriction: 0.009
+  staticFriction: 0.005
   bounciness: 0.42
   frictionCombine: 1
   bounceCombine: 0

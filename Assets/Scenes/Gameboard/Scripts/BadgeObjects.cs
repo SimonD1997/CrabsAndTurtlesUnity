@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Scenes.Gameboard.Scripts
 {
-    public class AbzeichenObjects
+    public class BadgeObjects
     {
         private int _abzeichenNumber;
         public Sprite[] _spriteList;
@@ -13,22 +13,22 @@ namespace Scenes.Gameboard.Scripts
         
         public int _count = 0;
 
-        public int GetAbzeichenNumber()
+        public int GetBadgeNumber()
         {
             return _abzeichenNumber;
         }
 
-        public int GetAbzeichenCount()
+        public int GetBadgeCount()
         {
             return _count;
         }
 
-        public void SetAbzeichenCount(int count)
+        public void SetBadgeCount(int count)
         {
             this._count += count;
         }
     
-        public AbzeichenObjects(int spriteNumber, Sprite sprite)
+        public BadgeObjects(int spriteNumber, Sprite sprite)
         {
             this._sprite = sprite;
             this._abzeichenNumber = spriteNumber;

@@ -4,6 +4,9 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// not used
+/// </summary>
 public class ClickScript : MonoBehaviour
 {
     

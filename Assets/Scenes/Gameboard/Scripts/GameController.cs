@@ -1,103 +1,95 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Xml.Linq;
-using Dreamteck;
 using DTT.Rankings.Runtime;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem.HID;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
 using Button = UnityEngine.UI.Button;
-using Image = UnityEngine.UIElements.Image;
 using Random = UnityEngine.Random;
-
-
-
 namespace Scenes.Gameboard.Scripts
 {
     public class GameController : MonoBehaviour
     {
         public bool debugMode = false;
+        public Camera m_camera;
         
         private int _diceNumber;
         
-        private bool gameIsRunning = false;
-        private int playerTurn = 0;
-        private int nextMove;
+        private bool _gameIsRunning = false;
+        private int _playerTurn = 0;
+        private int _startingPlayer;
+        private int _nextMove;
         private int _gameState = 0; // 0 = dice mode, 1 = draw mode, 2 = card mode
-
-        //if an actioncard change an variable the gamecontroller has to check the correct input bevor the next dice roll
         private int _newColourNumber;
         private int _corectionTimes = 1;
         private bool _actionCardState = false;
         private bool _riddleCardState = false;
         
-        
+        //Player & Movement
         public TextMeshProUGUI yourTurnField ;
         public RawImage playerImage;
         public RenderTexture[] playerImages;
         public MovementScript movementScript;
-        private MovementScript lastMovementScript;
-        public Abzeichen abzeichen;
-        private Abzeichen shownBadges;
-        public VariablenTafel variablenTafel;
-
+        private MovementScript _lastMovementScript;
+        public List<MovementScript> playerMovements;
+        
+        //Inventory & Badges
+        public Badges badges;
+        private Badges _shownBadges;
         public GameObject inventory;
         private Inventory _inventoryScript;
         public GameObject mainMenu;
-
-        public List<MovementScript> playerMovements;
+        public VariableField variableField;
         
-        public GameObject cardPrefab;
-        public GameObject riddleCardPrefab;
-        public Sprite[] cardPrefabStack;
-        public Sprite[] riddlePrefabStack;
-        
-        public Camera m_camera;
 
         private Timer _timer;
         
+        //Audio
         public AudioClip endOfTimerSound;
         private AudioSource _audioSource;
         
+        //UI Elements
         private int _correctAnswer;
         public bool inputFieldEnter = false;
         public TMP_InputField inputField;
         public TextMeshProUGUI inputFieldPlaceholder;
-        public TextMeshProUGUI timerField; 
+        [FormerlySerializedAs("timerField")] public TextMeshProUGUI textField; 
         public TMP_Text confirmButtonText;
         public Button confirmButton;
         public bool confirmButtonEnter = false;
         
-        //private GameObject[] _cardStack;
-        private List<GameObject> _cardList;
+        //Cards
+        public GameObject actionCardPrefab;
+        public GameObject riddleCardPrefab;
+        public Sprite[] actionCardPrefabStack;
+        public Sprite[] riddlePrefabStack;
+        
+        //Cards & Badges Lists
+        private List<GameObject> _actionCardList;
         private List<GameObject> _riddleCardList;
-        private List<int> _abzeichenList;
+        private List<int> _badgeList;
     
-        //Endgame
+        //Endgame & Scoreboard
         public GameObject scoreboardUI;
         public TextMeshProUGUI scoreboardText;
-        private int startingPlayer;
-        private bool endOfGame;
+        private bool _endOfGame;
         public LeaderboardUI _leaderboardUI;
         
 
         private void Awake()
         {
-            SetHorizontalFieldOfView(90);
+            SetHorizontalFieldOfView(90); // Set the horizontal field of view to 90 degrees --> all elements are displayed correctly
             
-            _cardList = new List<GameObject>();
+            _actionCardList = new List<GameObject>();
             _riddleCardList = new List<GameObject>();
-            _abzeichenList = new List<int>();
+            _badgeList = new List<int>();
 
             _inventoryScript = inventory.GetComponent<Inventory>();
 
             _audioSource = this.gameObject.GetComponent<AudioSource>();
             
-            //_cardStack = new GameObject[5];
             CardStack();
             
         }
@@ -115,31 +107,29 @@ namespace Scenes.Gameboard.Scripts
         // Start is called before the first frame update
         void Start()
         {
-           // Debug.Log(this._cardStack.Length.ToString());
-            this.gameIsRunning = true;
-            timerField.text = "";
-            this.inputField.textComponent.enableWordWrapping = true;
+           //Sets the game to running --> all elements are displayed correctly or hide for the start
+            _gameIsRunning = true;
+            textField.text = "";
+            inputField.textComponent.enableWordWrapping = true;
             inputFieldPlaceholder = inputField.placeholder.gameObject.GetComponent<TextMeshProUGUI>();
             inputFieldPlaceholder.text = "";
             inputField.interactable = false;
             confirmButtonText.text = "";
             confirmButton.interactable = false;
             
-            variablenTafel.SwitchInputFields(false);
-            variablenTafel.SwitchGameobjectState(false);
+            variableField.SwitchInputFields(false);
+            variableField.SwitchGameobjectState(false);
             
             //Starts the Game:
-            playerTurn = Random.Range(0, 2);
-            startingPlayer = playerTurn;
+            _playerTurn = Random.Range(0, 2);
+            _startingPlayer = _playerTurn;
             
-            movementScript = playerMovements[playerTurn];
-            lastMovementScript = playerMovements[(playerTurn+1)%2];
-            Debug.Log(movementScript.gameObject.name + "  &  " + lastMovementScript.gameObject.name);
+            movementScript = playerMovements[_playerTurn];
+            _lastMovementScript = playerMovements[(_playerTurn+1)%2];
             
-            abzeichen = movementScript.gameObject.GetComponent<Abzeichen>();
-            shownBadges = abzeichen;
-            // Warum auch immer gibt es Nullpointer exeptions TODO. Herausfinden warum... 
-            abzeichen.ShowAbzeichen();
+            badges = movementScript.gameObject.GetComponent<Badges>();
+            _shownBadges = badges;
+            badges.ShowBadge();
         }
         
         /// <summary>
@@ -151,25 +141,20 @@ namespace Scenes.Gameboard.Scripts
             for (int i = 0; i < 5; i++)
             {
                 GameObject tempCard = Instantiate(riddleCardPrefab, new Vector3(-35, -23, i), riddleCardPrefab.transform.rotation);
-                //tempCard.transform.rotation.Set(89,0,0,0 );
                 tempCard.GetComponentInChildren<SpriteRenderer>().sprite = riddlePrefabStack[Random.Range(0,riddlePrefabStack.Length)];
-                //this._cardStack[i] = tempCard;
-                //Karte dort runternehmen und dann den Stapel von unten auffüllen
                 _riddleCardList.Add(tempCard);
             }
             for (int i = 0; i < 5; i++)
             {
-                GameObject tempCard = Instantiate(cardPrefab, new Vector3(-35, -7, i), riddleCardPrefab.transform.rotation);
-                tempCard.GetComponentInChildren<SpriteRenderer>().sprite = cardPrefabStack[Random.Range(0,cardPrefabStack.Length)];
-                _cardList.Add(tempCard);
+                GameObject tempCard = Instantiate(actionCardPrefab, new Vector3(-35, -7, i), riddleCardPrefab.transform.rotation);
+                tempCard.GetComponentInChildren<SpriteRenderer>().sprite = actionCardPrefabStack[Random.Range(0,actionCardPrefabStack.Length)];
+                _actionCardList.Add(tempCard);
             }
             
-            //GameObject tempCard2 = this._cardList[4];
-            //tempCard2.GetComponent<CardFlipClick>().enabled = true;
+            //only the first cards are clickable --> delete this an uncomment the part in SetDiceNumber if only one card should be clickable
             _riddleCardList[0].gameObject.GetComponent<CardFlipClick>().enabled = true;
-            //_riddleCardList[0].gameObject.GetComponent<Animator>().enabled = true;
-            _cardList[0].gameObject.GetComponent<CardFlipClick>().enabled = true;
-            //_cardList[0].gameObject.GetComponent<Animator>().enabled = true;
+            _actionCardList[0].gameObject.GetComponent<CardFlipClick>().enabled = true;
+            
         }
         
         
@@ -187,17 +172,17 @@ namespace Scenes.Gameboard.Scripts
                 }
             }
             
-            if (gameIsRunning == true)
+            if (_gameIsRunning == true)
             {
                 
                 
-                if (playerTurn == 0)
+                if (_playerTurn == 0)
                 {
                     
                     this.yourTurnField.gameObject.SetActive(true);
                     this.yourTurnField.text = "CRAB IST DRAN!";
                     this.playerImage.texture = playerImages[0];
-                }else if (playerTurn == 1)
+                }else if (_playerTurn == 1)
                 {
                     
                     this.yourTurnField.gameObject.SetActive(true);
@@ -210,7 +195,7 @@ namespace Scenes.Gameboard.Scripts
                 }
 
 
-                if (inputFieldEnter == true && nextMove > 0 && _actionCardState == true)
+                if (inputFieldEnter == true && _nextMove > 0 && _actionCardState == true)
                 {
                     int input = 0;
                     if (!string.IsNullOrEmpty(inputField.text))
@@ -220,33 +205,31 @@ namespace Scenes.Gameboard.Scripts
 
                     }
                     
-                    if (input != nextMove)
+                    if (input != _nextMove)
                     {
-                        if (nextMove == 1)
+                        if (_nextMove == 1)
                         {
-                            timerField.text = "Dies war die falsche Angabe oder die der anderen Figur! Du darfst 1 Schritt vor gehen!";
+                            textField.text = "Dies war die falsche Angabe oder die der anderen Figur! Du darfst 1 Schritt vor gehen!";
                         }
                         else
                         {
-                            timerField.text = "Dies war die falsche Angabe oder die der anderen Figur! Du darfst "+ nextMove + " Schritte vor gehen!";
+                            textField.text = "Dies war die falsche Angabe oder die der anderen Figur! Du darfst "+ _nextMove + " Schritte vor gehen!";
                         }
                         
                     }
-                    var otherPosition = lastMovementScript.GetPosition();
+                    var otherPosition = _lastMovementScript.GetPosition();
                     var position = movementScript.GetPosition();
-                    if (position < otherPosition && otherPosition <= position + nextMove)
+                    if (position < otherPosition && otherPosition <= position + _nextMove)
                     {
-                        lastMovementScript.MoveAway(true);
+                        _lastMovementScript.MoveAway(true);
                     }
-                    this.movementScript.Movement(nextMove);
+                    this.movementScript.Movement(_nextMove);
 
-                    nextMove = 0;
-                    //inputField.text = "";
+                    _nextMove = 0;
                     inputFieldEnter = false;
-                    //StartCoroutine(WaiterToEndOfMove());
                     
-                    //TODO checken ob auch die Karte mit dem weiterlaufen funktioniert. Bzw. bei falscher Eingabe 
-                    // sollte der Text noch länger da stehen
+                    
+                    
                 }
             }
             else
@@ -264,51 +247,53 @@ namespace Scenes.Gameboard.Scripts
             
         }
         
+        /// <summary>
+        /// not implemented yet --> for online game or computer player
+        /// </summary>
         void TurnOfOtherPlayers()
         {
             //todo:
-            // warten falls andere Spieler analog anwesend sind oder
-            // einen virtuellen Zug machen falls gegen den Computer gekämpft wird
+            //wait for other player
+            //or make a computer player move
         
         }
+        
          /// <summary>
         /// sets the round for new player, checks max player and starts again at player 0
         /// </summary>
         void NextPlayer()
         {
-            
-            if (endOfGame)
+            if (_endOfGame)
             {
                 EndGame();
                 return;
             }
             
-            // sonst wird beim zweiten player/versuch die abzeichen nicht angefügt...
-            //_abzeichenList.Clear();
 
-            this.lastMovementScript = this.movementScript;
+            this._lastMovementScript = this.movementScript;
             
             int maxPlayer = 2;
-            if (playerTurn < maxPlayer - 1)
+            if (_playerTurn < maxPlayer - 1)
             {
-                playerTurn += 1;
+                _playerTurn += 1;
             }
             else
             {
-                playerTurn = 0;
+                _playerTurn = 0;
             }
-            this.movementScript = playerMovements[playerTurn];
+            this.movementScript = playerMovements[_playerTurn];
             movementScript.GetAnimator().SetInteger("Face",0);
-            this.abzeichen = this.movementScript.gameObject.GetComponent<Abzeichen>();
-            this.abzeichen.ShowAbzeichen();
+            this.badges = this.movementScript.gameObject.GetComponent<Badges>();
+            this.badges.ShowBadge();
         }
+         
         /// <summary>
         /// Gets the current player's turn.
         /// </summary>
         /// <returns>The current player's turn.</returns>
         public int GetPlayerTurn()
         {
-            return this.playerTurn;
+            return this._playerTurn;
         }
 
         /// <summary>
@@ -330,22 +315,26 @@ namespace Scenes.Gameboard.Scripts
             inputFieldEnter = true;
         }
 
+        /// <summary>
+        /// switches the inventory of the player to the other player's inventory. 
+        ///  </summary>
         public void SwitchInventory()
         {
-            if (shownBadges == abzeichen)
+            if (_shownBadges == badges)
             {
-                Debug.Log("Switch to"+lastMovementScript.gameObject.name);
-                shownBadges = lastMovementScript.gameObject.GetComponent<Abzeichen>();
+                Debug.Log("Switch to"+_lastMovementScript.gameObject.name);
+                _shownBadges = _lastMovementScript.gameObject.GetComponent<Badges>();
             }
             else
             {
-                shownBadges = abzeichen;
+                _shownBadges = badges;
             }
-            shownBadges.ShowAbzeichen();
+            _shownBadges.ShowBadge();
         }
         
         /// <summary>
         /// Ends the game and displays the scoreboard with final scores.
+        /// Play another round if the player who ended the game is not the starting player.
         /// </summary>
         private void EndGame()
         {
@@ -354,17 +343,17 @@ namespace Scenes.Gameboard.Scripts
             int winnerID = 0;
             
             // Check if the player who ended the game is not the starting player
-            if (playerTurn == startingPlayer)
+            if (_playerTurn == _startingPlayer)
             {
                 // Allow the second player to make one more move
                 NextPlayer();
                 Debug.Log("Second player gets one more move.");
                 
-                endOfGame = true;
+                _endOfGame = true;
             }
             else
             {
-                this.gameIsRunning = false;
+                this._gameIsRunning = false;
                 
                 this.yourTurnField.gameObject.SetActive(false);
                 
@@ -435,17 +424,43 @@ namespace Scenes.Gameboard.Scripts
             
         }
 
-
+        /// <summary>
+        /// Is called when the confirm button is clicked.
+        ///  </summary>
         public void ConfirmButtonClick()
         {
             confirmButtonEnter = true;
             inputFieldEnter = true;
         }
 
+        /// <summary>
+        /// Sets the next move for the player if the player has to move a certain number of steps after drawing a ActionCard.
+        ///  </summary>
         public void SetNextMove(int setNextMove)
         {
-            nextMove = setNextMove;
+            _nextMove = setNextMove;
         }
+        
+        /// <summary>
+        /// Handles the movement of the player. And checks if the other player is in the way. If so, the other player is moved away.
+        /// </summary>
+        /// <param name="move"> steps to move </param>
+        void MovementOfPlayer(int move)
+        {
+            var otherPosition = _lastMovementScript.GetPosition();
+            var position = movementScript.GetPosition();
+            
+            //Check if the other player is in the way and move him away if necessary
+            if (position < otherPosition && otherPosition <= position + move)
+            {
+                _lastMovementScript.MoveAway(true);
+            }
+            movementScript.MoveAway(false);
+            this.movementScript.Movement(move);
+            
+        }
+        
+        
         /// <summary>
         /// Gets the dice number.
         /// </summary>
@@ -455,7 +470,7 @@ namespace Scenes.Gameboard.Scripts
             return this._diceNumber;
         }
         
-        
+        /// <summary>
         /// Sets the dice number. And starts the movement of the player.
         /// Also flips cards if they are turned and removes them from the stack.
         /// </summary>
@@ -463,55 +478,60 @@ namespace Scenes.Gameboard.Scripts
         public void SetDiceNumber(int diceNumber)
         {
             
-            
             inputField.text = "";
+
+            //Not implemented --> Player can draw both cards
+            /*if (diceNumber % 2 == 0)
+            {
+                _riddleCardList[0].gameObject.GetComponent<CardFlipClick>().enabled = true;
+            }
+            else
+            {
+                _actionCardList[0].gameObject.GetComponent<CardFlipClick>().enabled = true;
+            }*/
             
-            if ( _actionCardState == false)
+            
+            if ( (_actionCardState && _riddleCardState) == false)
             {
                 
-                timerField.text = "";
+                textField.text = "";
                 _corectionTimes = 1;
                 
                 this._diceNumber = diceNumber;
                 
                 //Camera from player enabled
-               
                 movementScript.SetCameraActiv(true);
-                var otherPosition = lastMovementScript.GetPosition();
+                var otherPosition = _lastMovementScript.GetPosition();
                 var position = movementScript.GetPosition();
+                
+                //Check if the other player is in the way and move him away if necessary
                 if (position < otherPosition && otherPosition <= position + diceNumber)
                 {
-                    lastMovementScript.MoveAway(true);
+                    _lastMovementScript.MoveAway(true);
                 }
                 movementScript.MoveAway(false);
                 this.movementScript.Movement(diceNumber);
                 _gameState = 1;
-
-                //TODO is this part needed?
-                 //lastMovementScript = movementScript;
-                /*if (movementScript.GetEndOfGame())
-                {
-                    EndGame();
-                }*/
                 
-                this.abzeichen.ShowAbzeichen();
+                
+                this.badges.ShowBadge();
             
                 //Karten vom Stapel nehmen, wenn die Karte umgedreht ist.
 
-                GameObject tempCard = this._cardList[0].gameObject;
+                GameObject tempCard = this._actionCardList[0].gameObject;
                 GameObject tempCard2 = this._riddleCardList[0].gameObject;
                 if (tempCard.GetComponent<CardFlipClick>().GetTurnState() == false)
                 {
                     
                     StartCoroutine(WaiterAnimator(tempCard));
                     
-                    this._cardList.RemoveAt(0);
+                    this._actionCardList.RemoveAt(0);
                     
                 
                     //Karten alle um eins nach oben verschieben und neue Karte unten anfügen
                 
-                    MoveCardsUp(_cardList);
-                    AddCardStack(_cardList,cardPrefab,cardPrefabStack,-7);
+                    MoveCardsUp(_actionCardList);
+                    AddCardStack(_actionCardList,actionCardPrefab,actionCardPrefabStack,-7);
                 }
 
                 if (tempCard2.GetComponent<CardFlipClick>().GetTurnState() == false)
@@ -534,26 +554,31 @@ namespace Scenes.Gameboard.Scripts
         
         // Scripts to handle RiddleCards
         
-        public void StartRiddle(int correctAnswer, Timer timer, List<int> abzeichenList, int walkRightAnswer)
+        /// <summary>
+        /// Gets the necessary information from the riddle card and starts the riddle.
+        /// </summary>
+        /// <param name="correctAnswer"> the correct answer of the riddle </param>
+        /// <param name="timer"> the timer object </param>
+        /// <param name="badgeList"> a list of badges the player get if the answer is correct </param>
+        /// <param name="walkRightAnswer">steps to move after right answer </param>
+        public void StartRiddle(int correctAnswer, Timer timer, List<int> badgeList, int walkRightAnswer)
         {
             _riddleCardState = true;
             
-            //TODO: is this needed?
-            //this.lastMovementScript = this.movementScript;
-            
+            // Set the UI Elements to the correct state
             inputFieldPlaceholder.text = "Eingabefeld";
             inputField.interactable = true;
             inputField.text = "";
             inputFieldEnter = false;
             
-            variablenTafel.SwitchInputFields(false);
+            variableField.SwitchInputFields(false);
             
             confirmButton.interactable = true;
             confirmButtonText.text = "Bestätigen";
             
             _timer =  timer;
             _correctAnswer = correctAnswer;
-            nextMove = walkRightAnswer;
+            _nextMove = walkRightAnswer;
             
             _timer.SetTimerText("Timer: ");
             _timer.timeRemaining = 30;
@@ -562,39 +587,39 @@ namespace Scenes.Gameboard.Scripts
             
             movementScript.GetAnimator().SetInteger("Face",3);
             
-            _abzeichenList = abzeichenList;
+            _badgeList = badgeList;
             
-            StartCoroutine(Waiter());
+            StartCoroutine(WaiterRiddleCard1());
             
         }
         
+        /// <summary>
+        /// Checks the answer of the player and moves the player accordingly if the answer is correct and ends the round.
+        /// If the answer is wrong, the other player gets a chance to answer the riddle.
+        ///  </summary>
         void CheckAnswer(bool firstTry)
         {
             
             if (inputField.text.Equals(_correctAnswer.ToString()))
             {
                 Debug.Log("correct Answer");
-                inputField.text = "Richtige Antwort";
+                textField.text = "Richtige Antwort";
+                //inputField.text = "Richtige Antwort";
                 movementScript.GetAnimator().SetInteger("Face",1);
                 
                 //movement of player
-                var otherPosition = lastMovementScript.GetPosition();
-                var position = movementScript.GetPosition();
-                if (position < otherPosition && otherPosition <= position + nextMove)
-                {
-                    lastMovementScript.MoveAway(true);
-                }
-                this.movementScript.Movement(nextMove);
-                nextMove = 0;
+                MovementOfPlayer(_nextMove);
+                
+                _nextMove = 0;
                 
                 
-                variablenTafel.SwitchGameobjectState(false);
-                this.lastMovementScript.SetCameraActiv(false);
-                variablenTafel.SwitchInputFields(false);
+                variableField.SwitchGameobjectState(false);
+                this._lastMovementScript.SetCameraActiv(false);
+                variableField.SwitchInputFields(false);
                 
-                abzeichen.AddAbzeichen(_abzeichenList);
-                abzeichen.ShowAbzeichen();
-                abzeichen.ShowPopUp();
+                badges.AddBadges(_badgeList);
+                badges.ShowBadge();
+                badges.ShowPopUp();
                 
                 _gameState = 3;
                 _riddleCardState = false;
@@ -611,29 +636,28 @@ namespace Scenes.Gameboard.Scripts
                 
                 StartCoroutine(WaiterToEndOfMove());
                 
-
             }
             else 
             {
                 
-                
                 Debug.Log("wrong Answer");
-                inputField.text = "Falsche Antwort";
+                //inputField.text = "Falsche Antwort";
+                textField.text = "Falsche Antwort";
                 movementScript.GetAnimator().SetInteger("Face",4);
                 
                 if (firstTry)
                 {
                     NextPlayer();
                     movementScript.GetAnimator().SetInteger("Face",3);
-                    StartCoroutine(Waiter2());  
+                    StartCoroutine(WaiterRiddleCard2());  
                 }
                 else
                 {
-                    nextMove = 0;
+                    _nextMove = 0;
                     
-                    variablenTafel.SwitchInputFields(false);
-                    variablenTafel.SwitchGameobjectState(false);
-                    this.lastMovementScript.SetCameraActiv(false);
+                    variableField.SwitchInputFields(false);
+                    variableField.SwitchGameobjectState(false);
+                    this._lastMovementScript.SetCameraActiv(false);
                     
                     _gameState = 3;
                     _riddleCardState = false;
@@ -651,15 +675,14 @@ namespace Scenes.Gameboard.Scripts
                     StartCoroutine(WaiterToEndOfMove());
                 }
             }
-
-            if (firstTry)
-            {
-                //NextPlayer();
-            }
+            
             
         }
         
-        IEnumerator Waiter()
+        /// <summary>
+        /// Coroutine to wait during the timer is running and the player can answer the riddle.
+        ///  </summary>
+        IEnumerator WaiterRiddleCard1()
         {
             
             Debug.Log("correct Answer:" + _correctAnswer);
@@ -679,18 +702,19 @@ namespace Scenes.Gameboard.Scripts
                 } 
                 yield return null;
             }
-            //TODO play Sound to mark the end of the timer
+            
             _audioSource.PlayOneShot(endOfTimerSound);
             
             confirmButton.interactable = false;
             confirmButtonEnter = false;
             CheckAnswer(true);
         }
+        
         /// <summary>
         /// Waiter and Timer for second try from second player after wrong answer
         /// </summary>
         /// <returns></returns>
-        IEnumerator Waiter2()
+        IEnumerator WaiterRiddleCard2()
         {
             _timer.SetTimerText("Zeit zum weitergeben: ");
             _timer.timeRemaining = 5;
@@ -698,6 +722,8 @@ namespace Scenes.Gameboard.Scripts
             _timer.StartTimer(false);
             
             yield return new WaitForSeconds(5);
+            
+            //TODO: Confirm Button to switch to next player or something like that
             
             inputField.text = "";
             confirmButton.interactable = true;
@@ -719,8 +745,6 @@ namespace Scenes.Gameboard.Scripts
                     confirmButton.interactable = false;
                     confirmButtonEnter = true;
                     CheckAnswer(false);
-                    //important for update if player 2 gets the right answer ?? Eigentlich nicht... da ja in CheckAnswer
-                    //abzeichen.ShowAbzeichen();
                     yield break;
                 } 
                 yield return null;
@@ -730,62 +754,68 @@ namespace Scenes.Gameboard.Scripts
             confirmButton.interactable = false;
             confirmButtonEnter = true;
             CheckAnswer(false);
-            //important for update if player 2 gets the right answer
-            //abzeichen.ShowAbzeichen();
             
         }
         
         
         //Scripts to handle ActionCards
         
-        public void ActionCard(int newColourNumber,List<int> abzeichenList)
+        /// <summary>
+        ///  Gets the necessary information from the action card and starts the action. The player has to enter the correct variable.
+        /// </summary>
+        /// <param name="newColourNumber"> the new variable to put in the variable field. -999 if the movement card is drawn</param>
+        /// <param name="badgeList"> a list of badges the player get if the answer is correct </param>
+        public void ActionCard(int newColourNumber,List<int> badgeList)
         {
             inputFieldEnter = false;
-            //inputFieldPlaceholder.text = ""; set in class ActionCard
             _newColourNumber = newColourNumber;
             _actionCardState = true;
-            _abzeichenList = abzeichenList;
+            _badgeList = badgeList;
             
-            variablenTafel.SwitchInputFields(true);
+            variableField.SwitchInputFields(true);
             
             confirmButton.interactable = true;
             confirmButtonText.text = "Eingabe bestätigen";
             
-            StartCoroutine(Waiter3());
+            StartCoroutine(WaiterActionCard());
 
         }
         
-        IEnumerator Waiter3()
+        /// <summary>
+        /// Coroutine to handle the action card.
+        /// waits for the player to enter the correct variable and press the confirm button.
+        /// </summary>
+        /// <returns></returns>
+        IEnumerator WaiterActionCard()
         {
             confirmButtonEnter = false;
             while (true)
             {
-                
-                ///checks correct variablentafel bevor let the player roll the next dice
-                if ((_newColourNumber == variablenTafel.GetVar(movementScript.GetPositionColour()) ||
+                //check if the player has entered the correct variable combination in the variable field and pressed the confirm button
+                if ((_newColourNumber == variableField.GetVar(movementScript.GetPositionColour()) ||
                      _corectionTimes == 0) && confirmButtonEnter)
                 {
-                    variablenTafel.SwitchGameobjectState(false);
+                    variableField.SwitchGameobjectState(false);
 
-                    if (_newColourNumber == variablenTafel.GetVar(movementScript.GetPositionColour()))
+                    if (_newColourNumber == variableField.GetVar(movementScript.GetPositionColour()))
                     {
-                        timerField.text = "Richtige Antwort!";
+                        textField.text = "Richtige Antwort!";
                         movementScript.GetAnimator().SetInteger("Face",1);
                     }else
                     {
-                        timerField.text = "Falsche Antwort!";
+                        textField.text = "Falsche Antwort!";
                         movementScript.GetAnimator().SetInteger("Face",4);
                     }
                     
                     if (_corectionTimes == 1)
                     {
-                        // AbzeichenTest 
-                        abzeichen.AddAbzeichen(_abzeichenList);
-                        abzeichen.ShowAbzeichen();
-                        abzeichen.ShowPopUp();
+                        badges.AddBadges(_badgeList);
+                        badges.ShowBadge();
+                        badges.ShowPopUp();
+                        MovementOfPlayer(1);
                         
                     }
-                    this.lastMovementScript.SetCameraActiv(false);
+                    this._lastMovementScript.SetCameraActiv(false);
                     
                     confirmButton.interactable = false;
                     confirmButtonEnter = false;
@@ -797,30 +827,28 @@ namespace Scenes.Gameboard.Scripts
                     inputField.text = "";
                     _corectionTimes = 1;
 
-                    //Karten vom Stapel nehmen, wenn die Karte umgedreht ist.
-                    GameObject tempCard = this._cardList[0].gameObject;
+                    //remove the card from the stack and add a new card
+                    GameObject tempCard = this._actionCardList[0].gameObject;
                     StartCoroutine(WaiterAnimator(tempCard));
-                    this._cardList.RemoveAt(0);
-                    //Karten alle um eins nach oben verschieben und neue Karte unten anfügen
-                    MoveCardsUp(_cardList);
-                    AddCardStack(_cardList, cardPrefab, cardPrefabStack, -7);
+                    this._actionCardList.RemoveAt(0);
+                    MoveCardsUp(_actionCardList);
+                    AddCardStack(_actionCardList, actionCardPrefab, actionCardPrefabStack, -7);
 
                     
 
-                    //sets colour in Variablentafel (-999 stands für player movement and no variable change)
+                    //sets colour in variable field (-999 is for player movement and no variable change)
                     if (_newColourNumber != -999)
                     {
-                        variablenTafel.SetVar(movementScript.GetPositionColour(), _newColourNumber);
+                        variableField.SetVar(movementScript.GetPositionColour(), _newColourNumber);
 
                     }
-
                     
                     yield break;
 
-                }else if (_newColourNumber == -999 && nextMove == 0)
+                    // if card is a movement card and no variable change. 
+                    // Movement is done in Update() after the player has entered the correct number
+                }else if (_newColourNumber == -999 && _nextMove == 0)
                 {
-                    //abzeichen.AddAbzeichen(_abzeichenList);
-                    //abzeichen.ShowAbzeichen();
                     
                     confirmButton.interactable = false;
                     confirmButtonEnter = false;
@@ -830,18 +858,17 @@ namespace Scenes.Gameboard.Scripts
                     inputFieldPlaceholder.text = "";
                     
                     
-                    this.lastMovementScript.SetCameraActiv(false);
+                    this._lastMovementScript.SetCameraActiv(false);
                     
                     
                     _actionCardState = false;
                     
-                    //Karten vom Stapel nehmen, wenn die Karte umgedreht ist.
-                    GameObject tempCard = this._cardList[0].gameObject;
+                    //remove the card from the stack and add a new card
+                    GameObject tempCard = this._actionCardList[0].gameObject;
                     StartCoroutine(WaiterAnimator(tempCard));
-                    this._cardList.RemoveAt(0);
-                    //Karten alle um eins nach oben verschieben und neue Karte unten anfügen
-                    MoveCardsUp(_cardList);
-                    AddCardStack(_cardList, cardPrefab, cardPrefabStack, -7);
+                    this._actionCardList.RemoveAt(0);
+                    MoveCardsUp(_actionCardList);
+                    AddCardStack(_actionCardList, actionCardPrefab, actionCardPrefabStack, -7);
                     
                     
                     
@@ -849,7 +876,7 @@ namespace Scenes.Gameboard.Scripts
                 }
                 else if (confirmButtonEnter)
                 {
-                    timerField.text =
+                    textField.text =
                         "Falscher Spielzug: Überprüfe die Variablentafel! Du hast eine korrektur Möglichkeit!";
                     movementScript.GetAnimator().SetInteger("Face",2);
                     _corectionTimes -= 1;
@@ -931,11 +958,15 @@ namespace Scenes.Gameboard.Scripts
             
             yield return new WaitForSeconds(2);
             
-
+            
+            // different behaviour if the next player is already set course of a wrong answer in the riddle
             if (secondPlayer)
             {
-                inputField.text = "";
                 _gameState = 0;
+                // remove the response text after a delay
+                yield return new WaitForSeconds(2);
+                inputField.text = "";
+                textField.text = "";
             }
             
             if (secondPlayer == false)
@@ -953,11 +984,10 @@ namespace Scenes.Gameboard.Scripts
                         confirmButtonText.text = "";
                         confirmButton.interactable = false;
                         
-                        timerField.text = "";
-                        
+                        textField.text = "";
                         inputField.text = "";
                         
-                        abzeichen.HidePopUp();
+                        badges.HidePopUp();
                         
                         //If the game ends after the move
                         if (movementScript.GetEndOfGame())

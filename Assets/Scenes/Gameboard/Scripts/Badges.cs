@@ -6,11 +6,11 @@ using UnityEngine;
 
 namespace Scenes.Gameboard.Scripts
 {
-    public class Abzeichen : MonoBehaviour
+    public class Badges : MonoBehaviour
     {
         private GameController _gameController;
 
-        private List<AbzeichenObjects> _abzeichenList;
+        private List<BadgeObjects> _badgeList;
         public Sprite[] _spriteList;
         private Inventory _inventory;
         public Sprite spriteIcon;
@@ -18,11 +18,31 @@ namespace Scenes.Gameboard.Scripts
         private GameObject _popUpGameobject;
         private List<Sprite> _popUpSprites;
 
+        //Effekts for the badge pop up
         public EffekseerEffectAsset effect;
         public EffekseerEmitter emitter;
 
+        void Awake()
+        {
+            _inventory = FindFirstObjectByType<Inventory>();
+            _badgeList = new List<BadgeObjects>();
+            _popUpSprites = new List<Sprite>();
+        }
+        
+        // Start is called before the first frame update
+        void Start()
+        {
+            _gameController = FindFirstObjectByType<GameController>();
+
+            _popUpGameobject = _inventory._popUp;
+            _popUp = _popUpGameobject.GetComponentInChildren<PopUp>();
+            _popUpGameobject.SetActive(false);
+            InitInventory();
+        }
+        
         /// <summary>
-        /// Abzeichennummern
+        /// Add Badges to the inventory
+        /// Badge Number
         /// 0 = +
         /// 1 = *
         /// 2 = -
@@ -30,11 +50,11 @@ namespace Scenes.Gameboard.Scripts
         /// 4 = Variable
         /// 5 = Konstante
         /// </summary>
-        /// <param name="abzeichenNumber"></param>
-        public void AddAbzeichen(List<int> abzeichenNumber)
+        /// <param name="badgeNumber"> List of badges named with numbers to add to the inventory </param>
+        public void AddBadges(List<int> badgeNumber)
         {
             int[] tempAbzeichenArray = new int[6] { 9, 9, 9, 9, 9, 9 };
-            foreach (var VARIABLE in abzeichenNumber)
+            foreach (var VARIABLE in badgeNumber)
             {
                 if (VARIABLE == 0)
                 {
@@ -69,62 +89,48 @@ namespace Scenes.Gameboard.Scripts
                 {
                     _popUpSprites.Add(_spriteList[tempVar]);
 
-                    var badge = _abzeichenList[tempVar];
-                    if (badge.GetAbzeichenCount() == 0)
+                    var badge = _badgeList[tempVar];
+                    if (badge.GetBadgeCount() == 0)
                     {
                         badge.GetSetTransparent(false);
-                        badge.SetAbzeichenCount(1);
+                        badge.SetBadgeCount(1);
                     }
-                    else if (badge.GetAbzeichenCount() > 0)
+                    else if (badge.GetBadgeCount() > 0)
                     {
-                        badge.SetAbzeichenCount(1);
+                        badge.SetBadgeCount(1);
                     }
                 }
             }
         }
 
+        
+        /// <summary>
+        /// init the inventory with 6 badges and set them to transparent for the start of the game
+        /// </summary>
         void InitInventory()
         {
             for (int i = 0; i < 6; i++)
             {
-                AbzeichenObjects abzeichenObjects = new AbzeichenObjects(i, _spriteList[i]);
-                abzeichenObjects.GetSetTransparent(true);
-                _abzeichenList.Add(abzeichenObjects);
-                ShowAbzeichen();
+                BadgeObjects badgeObjects = new BadgeObjects(i, _spriteList[i]);
+                badgeObjects.GetSetTransparent(true);
+                _badgeList.Add(badgeObjects);
+                ShowBadge();
             }
         }
-
-        public void AbzeichenTest()
+        
+        /// <summary>
+        /// refresh the inventory in the UI
+        /// </summary>
+        public void ShowBadge()
         {
-            Debug.Log("AbzeichenTest");
-        }
-
-        void Awake()
-        {
-            _inventory = FindFirstObjectByType<Inventory>();
-            _abzeichenList = new List<AbzeichenObjects>();
-            _popUpSprites = new List<Sprite>();
-        }
-
-
-        // Start is called before the first frame update
-        void Start()
-        {
-            _gameController = FindFirstObjectByType<GameController>();
-            //_inventory = FindFirstObjectByType<Inventory>();
-
-            _popUpGameobject = _inventory._popUp;
-            _popUp = _popUpGameobject.GetComponentInChildren<PopUp>();
-            _popUpGameobject.SetActive(false);
-            InitInventory();
-        }
-
-        public void ShowAbzeichen()
-        {
-            _inventory.SetInventory(_abzeichenList);
+            _inventory.SetInventory(_badgeList);
             _inventory.SetPlayerIcon(this.spriteIcon);
         }
 
+        /// <summary>
+        /// show the pop up with the badges that are added to the inventory and the player gets in this round
+        /// 
+        /// </summary>
         public void ShowPopUp()
         {
             if (_popUp == null)
@@ -135,6 +141,11 @@ namespace Scenes.Gameboard.Scripts
             StartCoroutine(ShowingBadgesPopUp());
         }
 
+        /// <summary>
+        /// Coroutine for showing the pop up with the badges with sound and effect
+        /// The pop up is shown for 3 seconds
+        /// </summary>
+        /// <returns></returns>
         IEnumerator ShowingBadgesPopUp()
         {
             _popUpGameobject.SetActive(true);
@@ -153,6 +164,9 @@ namespace Scenes.Gameboard.Scripts
             _popUpGameobject.SetActive(false);
         }
         
+        /// <summary>
+        /// Stop showing the pop up
+        /// </summary>
         internal void HidePopUp()
         {
             StopCoroutine(ShowingBadgesPopUp());
@@ -160,19 +174,27 @@ namespace Scenes.Gameboard.Scripts
             _popUpGameobject.SetActive(false);
         }
 
+        /// <summary>
+        /// calculate the score of the player and return it
+        /// </summary>
+        /// <returns>score of the player</returns>
         public int GetScore()
         {
             int score = 0;
-            foreach (var abzeichen in _abzeichenList)
+            foreach (var abzeichen in _badgeList)
             {
-                score += abzeichen.GetAbzeichenCount();
+                score += abzeichen.GetBadgeCount();
             }
 
             return score;
         }
 
-        public List<AbzeichenObjects> GetAbzeichenList()
+        /// <summary>
+        /// Return the badge list of this player
+        /// </summary>
+        /// <returns>all badges of the player</returns>
+        public List<BadgeObjects> GetBadgeList()
         {
-            return  _abzeichenList;        }
+            return  _badgeList;        }
     }
 }

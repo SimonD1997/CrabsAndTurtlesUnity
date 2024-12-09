@@ -8,24 +8,24 @@ namespace Scenes.Gameboard.Scripts
     public class Inventory : MonoBehaviour
     {
         public Image[] imageSlots;
-        private AbzeichenObjects[] _abzeichenObjectsArray;
+        private BadgeObjects[] _abzeichenObjectsArray;
         public Image playerIcon;
         public GameObject _popUp;
         
         public GridLayoutGroup gridLayoutGroup;
         public RectTransform parentRectTransform;
 
-        private List<AbzeichenObjects> _abzeichenObjectsList;
+        private List<BadgeObjects> _abzeichenObjectsList;
         
         
     
         // Start is called before the first frame update
         void Start()
         {
-            _abzeichenObjectsArray = new AbzeichenObjects[imageSlots.Length];
+            _abzeichenObjectsArray = new BadgeObjects[imageSlots.Length];
         }
 
-        public void SetInventory(List<AbzeichenObjects> abzeichenObjectsList)
+        public void SetInventory(List<BadgeObjects> abzeichenObjectsList)
         {
             this._abzeichenObjectsList = abzeichenObjectsList;
             UpdateInventory();
@@ -41,7 +41,7 @@ namespace Scenes.Gameboard.Scripts
                 //imageSlots[i].enabled = true;
                 //imageSlots[i].sprite = abzeichenObjectsList[i].GetSprite();
 
-                int abzeichennumber = _abzeichenObjectsList[i].GetAbzeichenCount();
+                int abzeichennumber = _abzeichenObjectsList[i].GetBadgeCount();
                 if (abzeichennumber > 1)
                 {
                     imageSlots[i].gameObject.GetComponentInChildren<TMP_Text>().text = abzeichennumber.ToString();

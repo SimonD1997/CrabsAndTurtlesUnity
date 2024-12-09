@@ -8,7 +8,7 @@ using UnityEngine.Serialization;
 namespace Scenes.Gameboard.Scripts
 {
     
-    public class VariablenTafel : MonoBehaviour
+    public class VariableField : MonoBehaviour
     {
         int _aktuelleVarGruen = 1;
         int _aktuelleVarRot = 1;

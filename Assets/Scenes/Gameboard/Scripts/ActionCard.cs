@@ -9,7 +9,7 @@ public class ActionCard : MonoBehaviour
 {
     private GameController _gameController;
     private SpriteRenderer _spriteRenderer;
-    private VariablenTafel _variablenTafel;
+    private VariableField _variableField;
     private TextMeshProUGUI _inputField;
     
     public string _cardName;
@@ -27,7 +27,7 @@ public class ActionCard : MonoBehaviour
         _abzeichen = new List<int>();
         
         _gameController = FindObjectOfType<GameController>();
-        _variablenTafel = this._gameController.variablenTafel;
+        _variableField = this._gameController.variableField;
         
         _spriteRenderer = this.gameObject.GetComponentInChildren<SpriteRenderer>();
         _cardName = _spriteRenderer.sprite.name;
@@ -50,11 +50,11 @@ public class ActionCard : MonoBehaviour
             case 1:
                 _inputField.text = "";
                 _gameController.inputField.interactable = false;
-                _gameController.variablenTafel.SwitchGameobjectState(true);
+                _gameController.variableField.SwitchGameobjectState(true);
                 elementWert = Convert.ToInt32(_cardName[1..3]);
                 if (_cardName[3].ToString() == "+")
                 {
-                    _colourVariablesNew = this._variablenTafel.GetVar(_gameController.movementScript.GetPositionColour()) +
+                    _colourVariablesNew = this._variableField.GetVar(_gameController.movementScript.GetPositionColour()) +
                                           elementWert;
                     _abzeichen.Add(4);
 
@@ -89,8 +89,8 @@ public class ActionCard : MonoBehaviour
                 _gameController.inputField.interactable = false;
                 
                 _abzeichen.Add(3);
-                _gameController.variablenTafel.SwitchGameobjectState(true);
-                int positionColour = this._variablenTafel.GetVar(_gameController.movementScript.GetPositionColour());
+                _gameController.variableField.SwitchGameobjectState(true);
+                int positionColour = this._variableField.GetVar(_gameController.movementScript.GetPositionColour());
                 if (_cardName[3].ToString() == "g")
                 {
                     if (positionColour > Convert.ToInt32(_cardName[1..3]))

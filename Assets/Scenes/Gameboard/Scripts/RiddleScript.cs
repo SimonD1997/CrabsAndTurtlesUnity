@@ -8,7 +8,7 @@ public class RiddleScript : MonoBehaviour
 {
     private GameController _gameController;
     private SpriteRenderer _spriteRenderer;
-    private VariablenTafel _variablenTafel;
+    private VariableField _variableField;
     public string _cardName;
     public byte _elementeAnzahl;
     private List<byte> _elemente;
@@ -25,7 +25,7 @@ public class RiddleScript : MonoBehaviour
         _abzeichen = new List<int>();
         
         _gameController = FindObjectOfType<GameController>();
-        _variablenTafel = this._gameController.variablenTafel;
+        _variableField = this._gameController.variableField;
         _elemente = new List<byte>();
         _elementeRightAnswer = new List<int>();
         
@@ -173,9 +173,9 @@ public class RiddleScript : MonoBehaviour
             case 2:
                 _abzeichen.Add(4);
                 Debug.Log(_gameController.movementScript.GetPositionColour());
-                Debug.Log(this._variablenTafel.name);
-                Debug.Log(this._variablenTafel.GetVar(_gameController.movementScript.GetPositionColour()));
-                elementWert = this._variablenTafel.GetVar(_gameController.movementScript.GetPositionColour());
+                Debug.Log(this._variableField.name);
+                Debug.Log(this._variableField.GetVar(_gameController.movementScript.GetPositionColour()));
+                elementWert = this._variableField.GetVar(_gameController.movementScript.GetPositionColour());
                 Debug.Log(elementWert);
                 break;
             case 3:
@@ -197,9 +197,9 @@ public class RiddleScript : MonoBehaviour
     public void StartRiddle()
     {
         CollectAnswer();
-        _gameController.variablenTafel.SwitchGameobjectState(true);
+        _gameController.variableField.SwitchGameobjectState(true);
         Timer timer = this.gameObject.AddComponent<Timer>();
-        timer.InitTimer(_gameController.timerField);
+        timer.InitTimer(_gameController.textField);
         //timer.StartTimer();
         //timer.timerIsRunning = true;
         _gameController.StartRiddle(_answer, timer, _abzeichen, _walkRightAnswer);

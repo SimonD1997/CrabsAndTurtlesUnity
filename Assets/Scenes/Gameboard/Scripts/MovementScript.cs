@@ -1,5 +1,6 @@
 using Dreamteck.Splines;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Scenes.Gameboard.Scripts
@@ -12,34 +13,29 @@ namespace Scenes.Gameboard.Scripts
         public RenderTexture cameraImage;
         private SplineUser _splineUser;
         private Dreamteck.Splines.SplineFollower _splineFollower;
-        public int aktuellePosition;
-        private int endPosition = 40;
+        public int currentPosition;
+        private int _endPosition = 40;
         
         private Animator _anim;
         private Camera _camera;
     
-        private Abzeichen _badges;
+        private Badges _badges;
         
         private AudioSource _audioSource;
         public AudioClip audioClipWalking;
-    
-        /// <summary>
-        /// gerade positionen sind rästelkarten und ungerade sind ereigniskarten
-        /// </summary>
+        
         private byte _positionCard;
     
         private int _positionColour; 
     
         private bool _endOfGame = false;
-    
-    
-        // Array für distanzen der einzelnen Felder
+        
+        
+        /// <summary>
+        ///Array for the positions of the fields
+        /// </summary>
         double[] _felder = new double[]
         {
-            
-            
-            
-            
             0,
             0.03833961,
             0.06101561,
@@ -82,7 +78,9 @@ namespace Scenes.Gameboard.Scripts
             0.9642977,
             1
         };
+        
         /// <summary>
+        /// Colour of the fields
         /// red = 1
         /// blue = 2
         /// gruen = 3
@@ -139,32 +137,24 @@ namespace Scenes.Gameboard.Scripts
         {
             _splineUser = GetComponent<SplineUser>();
             _splineFollower = GetComponent<Dreamteck.Splines.SplineFollower>();
-            //setzt die Anfangs und Endanimationspunkte fest.
             _splineUser.SetClipRange(_felder[0], _felder[0]);
 
             _anim = _splineUser.gameObject.GetComponent<Animator>();
             _camera = this.gameObject.GetComponentInChildren<Camera>();
             _audioSource = this.gameObject.GetComponent<AudioSource>();
         
-            aktuellePosition = 0;
+            currentPosition = 0;
             
-            endPosition = PlayerPrefs.GetInt("EndPosition", 40);
-
-            //setzt die Richtungsparameter bzw. lässt den start manuell auswählen
-            //_splineFollower.autoStartPosition = false;
-            //_splineFollower.direction = Spline.Direction.Backward;
-            //
-            //legt den Startpunkt durch den Abstand vom Anfang des Splines fest in Prozent 
-            //deshalb möglichkeit des von der Streckenlänge in Prozent umzurechnen
-            //float splineLength = _splineFollower.spline.CalculateLength();
-            //_splineFollower.SetDistance(splineLength,false,false);
-
-            //TODO noch Möglichkeit suchen den Abstand der Knoten vom Startpunkt auszulesen...!!!
-
-            _badges = this.gameObject.GetComponent<Abzeichen>();
+            _endPosition = PlayerPrefs.GetInt("EndPosition", 40);
+            
+            _badges = this.gameObject.GetComponent<Badges>();
 
         }
 
+        /// <summary>
+        ///  Set the camera object active or inactive
+        /// </summary>
+        /// <param name="activ"> true = active; false = inactive </param>
         public void SetCameraActiv(bool activ)
         {
             if (activ)
@@ -176,9 +166,12 @@ namespace Scenes.Gameboard.Scripts
             canvasCamera.gameObject.SetActive(activ);
             
             
-            //_canvas.SetActive(activ);
         } 
         
+        /// <summary>
+        /// Returns the animator of the player object
+        /// </summary>
+        /// <returns>animator of player object</returns>
         public Animator GetAnimator()
         {
             return _anim;
@@ -186,31 +179,30 @@ namespace Scenes.Gameboard.Scripts
     
 
         /// <summary>
-        /// Lässt das Objekt an einem gegeben Spline entlanglaufen.
+        /// moves the player on the gameboard on a spline path
         /// </summary>
-        /// <param name="steps"> legt fest wie viele Blöcke nach vorne oder zurückgelaufen werden messen</param>
+        /// <param name="steps"> steps forwards or backwards</param>
         public void Movement(int steps)
         {
-            if (aktuellePosition == 0)
+            if (currentPosition == 0)
             {
                 _anim.SetTrigger("toStart");
             }
             
             _audioSource.loop = true;
             _audioSource.clip = audioClipWalking;
-            // falls über oder unter die Arraygrenze kommt, schauen wie in den Regeln behandelt werden soll;
-            // ob man direkt treffen muss oder solange weitergeht wie es halt geht
+
         
-            if (aktuellePosition + steps > endPosition-1)
+            if (currentPosition + steps > _endPosition-1)
             {
                 Debug.Log("End of Game Movement");
                 
-                _splineUser.SetClipRange(_felder[aktuellePosition], _felder[endPosition]);
+                _splineUser.SetClipRange(_felder[currentPosition], _felder[_endPosition]);
                 _splineFollower.Restart();
                 _splineFollower.Rebuild();
                 
-                aktuellePosition = endPosition;
-                _positionColour = _felderColour[aktuellePosition];
+                currentPosition = _endPosition;
+                _positionColour = _felderColour[currentPosition];
                 
                 if (!_endOfGame)
                 {
@@ -226,33 +218,36 @@ namespace Scenes.Gameboard.Scripts
             {
                 Debug.Log("Do Step Movement");
 
-                _splineUser.SetClipRange(_felder[aktuellePosition], _felder[aktuellePosition + steps]);
+                _splineUser.SetClipRange(_felder[currentPosition], _felder[currentPosition + steps]);
                 _splineFollower.Restart();
                 _splineFollower.Rebuild();
-                aktuellePosition = aktuellePosition + steps;
-                _positionColour = _felderColour[aktuellePosition];
+                currentPosition = currentPosition + steps;
+                _positionColour = _felderColour[currentPosition];
 
             }
             else if (steps < 0)
             {
-                _splineUser.SetClipRange(_felder[aktuellePosition], _felder[aktuellePosition + steps]);
+                _splineUser.SetClipRange(_felder[currentPosition], _felder[currentPosition + steps]);
                 _splineFollower.Restart();
                 _splineFollower.Rebuild();
                 _splineFollower.direction = Spline.Direction.Backward;
-                aktuellePosition = aktuellePosition + steps;
+                currentPosition = currentPosition + steps;
 
             }
 
             _anim.SetBool("Walk", true);
             _audioSource.Play();
-
-        
+            
 
         }
 
+        /// <summary>
+        /// Get the position symbol on the game board so that the correct card can be drawn
+        /// </summary>
+        /// <returns> 0 = riddle card; 1 = action card </returns>
         public int GetPositionCard()
         {
-            if (aktuellePosition%2 == 0)
+            if (currentPosition%2 == 0)
             {
                 return _positionCard = 0;
             }
@@ -263,16 +258,27 @@ namespace Scenes.Gameboard.Scripts
         
         }
 
+        /// <summary>
+        /// Get the current position of the player on the game board
+        /// </summary>
+        /// <returns> field number on the gameboard </returns>
         public int GetPosition()
         {
-            return aktuellePosition;
+            return currentPosition;
         }
     
+        /// <summary>
+        /// Get the colour of the field on the game board
+        /// </summary>
+        /// <returns>colour of the field on the game board</returns>
         public int GetPositionColour()
         {
             return _positionColour;
         }
-
+        
+        /// <summary>
+        /// Handles the end of the movement of the player with the animation and the audio
+        /// </summary>
         public void EndOfMovement()
         {
             _anim.SetBool("Walk",false);
@@ -281,19 +287,32 @@ namespace Scenes.Gameboard.Scripts
         
         }
     
+        
+        /// <summary>
+        /// Returns true if the player reached the end of the game
+        /// </summary>
+        /// <returns>if the player reached the end</returns>
         public bool GetEndOfGame()
         {
             return _endOfGame;
         }
     
+        /// <summary>
+        /// Returns the score of the player
+        /// </summary>
+        /// <returns>score of the player, summ of all badges</returns>
         public int GetScore()
         {
             return _badges.GetScore();
         }
 
-        public void MoveAway(bool b)
+        /// <summary>
+        /// Moves the player to the side if the other player moves to the same field or back to the path
+        /// </summary>
+        /// <param name="toSide"> true = moves to side; false = moves back to path  </param>
+        public void MoveAway(bool toSide)
         {
-            _anim.SetBool("toSide",b);
+            _anim.SetBool("toSide",toSide);
         }
     }
 }
