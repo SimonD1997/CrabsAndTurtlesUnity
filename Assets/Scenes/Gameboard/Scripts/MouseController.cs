@@ -1,8 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+
+/// <summary>
+/// Not used in the final project.
+/// </summary>
 public class MouseController : MonoBehaviour
 {
     Camera m_Camera;

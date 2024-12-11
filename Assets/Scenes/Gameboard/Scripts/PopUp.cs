@@ -1,37 +1,43 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PopUp : MonoBehaviour
+namespace Scenes.Gameboard.Scripts
 {
-    public List<Image> imageList;
-    private List<Sprite> _spritesForImages;
+    public class PopUp : MonoBehaviour
+    {
+        public List<Image> imageList;
+        private List<Sprite> _spritesForImages;
     
-    // Start is called before the first frame update
-    void Start()
-    {
-        _spritesForImages = new List<Sprite>();
-    }
-
-    public void showImagesforSprites(List<Sprite> sprites)
-    {
-        _spritesForImages = sprites;
-
-        for (int i = 0; i < _spritesForImages.Count; i++)
+        // Start is called before the first frame update
+        void Start()
         {
-            imageList[i].sprite = _spritesForImages[i];
-            imageList[i].gameObject.SetActive(true);
+            _spritesForImages = new List<Sprite>();
         }
 
-        if (imageList.Count - _spritesForImages.Count != 0)
+        /// <summary>
+        ///  Show images of badges for the player with the sprites provided
+        /// </summary>
+        /// <param name="sprites"> List of sprites to show</param>
+        public void ShowImagesforSprites(List<Sprite> sprites)
         {
-            for (int i = _spritesForImages.Count; i < imageList.Count; i++)
+            _spritesForImages = sprites;
+
+            for (int i = 0; i < _spritesForImages.Count; i++)
             {
-                imageList[i].gameObject.SetActive(false);
+                imageList[i].sprite = _spritesForImages[i];
+                imageList[i].gameObject.SetActive(true);
+            }
+
+            if (imageList.Count - _spritesForImages.Count != 0)
+            {
+                for (int i = _spritesForImages.Count; i < imageList.Count; i++)
+                {
+                    imageList[i].gameObject.SetActive(false);
+                }
             }
         }
+    
+    
     }
-    
-    
 }

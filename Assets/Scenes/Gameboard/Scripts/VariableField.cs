@@ -1,29 +1,27 @@
 using System;
 using System.Collections.Generic;
-using System.Net.Mime;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Scenes.Gameboard.Scripts
 {
     
     public class VariableField : MonoBehaviour
     {
-        int _aktuelleVarGruen = 1;
-        int _aktuelleVarRot = 1;
-        int _aktuelleVarBlau = 1;
-        int _aktuelleVarGelb = 1;
+        private int _currentVarGreen = 1;
+        private int _currentVarRed = 1;
+        private int _currentVarBlue = 1;
+        private int _currentVarYellow = 1;
         
-        private List<int> _gruenVarList;
-        private List<int> _rotVarList;
-        private List<int> _blauVarList;
-        private List<int> _gelbVarList;
+        private List<int> _greenVarList;
+        private List<int> _redVarList;
+        private List<int> _blueVarList;
+        private List<int> _yellowVarList;
         
-        public GameObject gruenGameObject;
-        public GameObject rotGameObject;
-        public GameObject blauGameObject;
-        public GameObject gelbGameObject;
+        public GameObject greenGameObject;
+        public GameObject redGameObject;
+        public GameObject blueGameObject;
+        public GameObject yellowGameObject;
         public GameObject logTextField;
         public Animator button;
 
@@ -47,10 +45,10 @@ namespace Scenes.Gameboard.Scripts
         // Start is called before the first frame update
         void Start()
         {
-            _gruenVarList = new List<int>();
-            _rotVarList = new List<int>();
-            _blauVarList = new List<int>();
-            _gelbVarList = new List<int>();
+            _greenVarList = new List<int>();
+            _redVarList = new List<int>();
+            _blueVarList = new List<int>();
+            _yellowVarList = new List<int>();
             
             AddToList();
 
@@ -59,22 +57,26 @@ namespace Scenes.Gameboard.Scripts
 
         private void Awake()
         {
-            _greenTextField = gruenGameObject.GetComponentInChildren<TMP_InputField>();
-            _redTextField = rotGameObject.GetComponentInChildren<TMP_InputField>();
-            _yellowTextField = gelbGameObject.GetComponentInChildren<TMP_InputField>();
-            _blueTextField = blauGameObject.GetComponentInChildren<TMP_InputField>();
+            _greenTextField = greenGameObject.GetComponentInChildren<TMP_InputField>();
+            _redTextField = redGameObject.GetComponentInChildren<TMP_InputField>();
+            _yellowTextField = yellowGameObject.GetComponentInChildren<TMP_InputField>();
+            _blueTextField = blueGameObject.GetComponentInChildren<TMP_InputField>();
 
             _greenPlaceholder = _greenTextField.placeholder.gameObject.GetComponent<TextMeshProUGUI>();
             _redPlaceholder = _redTextField.placeholder.gameObject.GetComponent<TextMeshProUGUI>();
             _yellowPlaceholder = _yellowTextField.placeholder.gameObject.GetComponent<TextMeshProUGUI>();
             _bluePlaceholder = _blueTextField.placeholder.gameObject.GetComponent<TextMeshProUGUI>();
 
-            _greenTextFieldList = gruenGameObject.GetComponentsInChildren<TextMeshProUGUI>();
-            _redTextFieldList = rotGameObject.GetComponentsInChildren<TextMeshProUGUI>();
-            _yellowTextFieldList = gelbGameObject.GetComponentsInChildren<TextMeshProUGUI>();
-            _blueTextFieldList = blauGameObject.GetComponentsInChildren<TextMeshProUGUI>();
+            _greenTextFieldList = greenGameObject.GetComponentsInChildren<TextMeshProUGUI>();
+            _redTextFieldList = redGameObject.GetComponentsInChildren<TextMeshProUGUI>();
+            _yellowTextFieldList = yellowGameObject.GetComponentsInChildren<TextMeshProUGUI>();
+            _blueTextFieldList = blueGameObject.GetComponentsInChildren<TextMeshProUGUI>();
         }
 
+        /// <summary>
+        ///  Switches the Inputfields to active or inactive
+        /// </summary>
+        /// <param name="inputFieldsActive"> true = active, false = inactive</param>
         public void SwitchInputFields(bool inputFieldsActive)
         {
             if (inputFieldsActive)
@@ -103,6 +105,10 @@ namespace Scenes.Gameboard.Scripts
             }
         }
 
+        /// <summary>
+        ///  Switches the Gameobject to active or inactive
+        /// </summary>
+        /// <param name="active"> true = active, false = inactive</param>
         public void SwitchGameobjectState(bool active)
         {
             if (active)
@@ -117,6 +123,9 @@ namespace Scenes.Gameboard.Scripts
             }
         }
         
+        /// <summary>
+        ///  Switches the Gameobject to active or inactive depending on the current state
+        /// </summary>
         public void SwitchGameobjectState()
         {
             if (this.gameObject.activeSelf)
@@ -130,17 +139,11 @@ namespace Scenes.Gameboard.Scripts
                 this.gameObject.SetActive(true);
             }
         }
-
-        // Update is called once per frame
-        void Update()
-        {
         
-        }
-
-        // gibt nach jedem Input alle Variablen aller Spalten in neu in die Liste ein um 
-        // um ein nachvollziehbaren log zu erhalten...
-        
-        public void Gruen()
+        /// <summary>
+        ///  Used to get the variables of the clicked colour inputfield
+        /// </summary>
+        public void Green()
         {
             string input = _greenTextField.text;
             if (string.IsNullOrEmpty(input))
@@ -149,13 +152,15 @@ namespace Scenes.Gameboard.Scripts
                 return;
             }
             
-            _aktuelleVarGruen = Convert.ToInt32(input);
+            _currentVarGreen = Convert.ToInt32(input);
             _greenPlaceholder.text = input;
-            //addToList();
-            //gruenGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarGruen.ToString();
+
         }
 
-        public void Rot()
+        /// <summary>
+        ///  Used to get the variables of the clicked colour inputfield
+        /// </summary>
+        public void Red()
         {
             string input = _redTextField.text;
             if (string.IsNullOrEmpty(input))
@@ -164,13 +169,16 @@ namespace Scenes.Gameboard.Scripts
                 return;
             }
 
-            _aktuelleVarRot = Convert.ToInt32(input);
+            _currentVarRed = Convert.ToInt32(input);
             _redPlaceholder.text = input;
             //addToList();
             //rotGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarRot.ToString();
         }
 
-        public void Blau()
+        /// <summary>
+        ///  Used to get the variables of the clicked colour inputfield
+        /// </summary>
+        public void Blue()
         {
             string input = _blueTextField.text;
             if (string.IsNullOrEmpty(input))
@@ -179,13 +187,16 @@ namespace Scenes.Gameboard.Scripts
                 return;
             }
 
-            _aktuelleVarBlau = Convert.ToInt32(input);
+            _currentVarBlue = Convert.ToInt32(input);
             _bluePlaceholder.text = input;
             //addToList();
             //blauGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarBlau.ToString();
         }
 
-        public void Gelb()
+        /// <summary>
+        ///  Used to get the variables of the clicked colour inputfield
+        /// </summary>
+        public void Yellow()
         {
             string input =_yellowTextField.text;
             if (string.IsNullOrEmpty(input))
@@ -194,18 +205,19 @@ namespace Scenes.Gameboard.Scripts
                 return;
             }
 
-            _aktuelleVarGelb = Convert.ToInt32(input);
+            _currentVarYellow = Convert.ToInt32(input);
             _yellowPlaceholder.text = input;
-            //addToList();
-            //gelbGameObject.GetComponentInChildren<TextMeshProUGUI>().text = _aktuelleVarGelb.ToString();
         }
 
+        /// <summary>
+        ///  Adds the current Variables to the List
+        /// </summary>
         void AddToList()
         {
-            _gruenVarList.Add(_aktuelleVarGruen);
-            _rotVarList.Add(_aktuelleVarRot);
-            _blauVarList.Add(_aktuelleVarBlau);
-            _gelbVarList.Add(_aktuelleVarGelb);
+            _greenVarList.Add(_currentVarGreen);
+            _redVarList.Add(_currentVarRed);
+            _blueVarList.Add(_currentVarBlue);
+            _yellowVarList.Add(_currentVarYellow);
             
         }
 
@@ -216,11 +228,11 @@ namespace Scenes.Gameboard.Scripts
         {
             String stringtemp = "";
             TextMeshProUGUI logTemp = logTextField.GetComponent<TextMeshProUGUI>();
-            for (int i = 0; i < _gruenVarList.Count; i++)
+            for (int i = 0; i < _greenVarList.Count; i++)
             {
-                logTemp.text.Insert(logTemp.text.Length, _aktuelleVarGruen.ToString());
-                stringtemp = stringtemp +  _gruenVarList[i].ToString() + "\t" +_rotVarList[i].ToString() +
-                "\t" + _blauVarList[i].ToString() + "\t" + _gelbVarList[i].ToString() + System.Environment.NewLine;
+                logTemp.text.Insert(logTemp.text.Length, _currentVarGreen.ToString());
+                stringtemp = stringtemp +  _greenVarList[i].ToString() + "\t" +_redVarList[i].ToString() +
+                "\t" + _blueVarList[i].ToString() + "\t" + _yellowVarList[i].ToString() + System.Environment.NewLine;
                 
             }
             
@@ -228,31 +240,36 @@ namespace Scenes.Gameboard.Scripts
 
         }
 
-        
+        /// <summary>
+        ///  Returns the current Variable of the given Colour
+        /// </summary>
+        /// <param name="colour">1 = red, 2 = blue, 3 = green, 4 = yellow</param>
+        /// <returns> Current Variable of the given Colour</returns>
         public int GetVar(int colour)
         {
             int colourVar = 0;
             switch (colour)
             {
                 case 1: //red
-                    colourVar = _aktuelleVarRot;
+                    colourVar = _currentVarRed;
                     break;
                 case 2: //blue
-                    colourVar = _aktuelleVarBlau;
+                    colourVar = _currentVarBlue;
                     break;
                 case 3: //gruen
-                    colourVar = _aktuelleVarGruen;
+                    colourVar = _currentVarGreen;
                     break;
                 case 4: //gelb
-                    colourVar = _aktuelleVarGelb;
+                    colourVar = _currentVarYellow;
                     break;
             }
 
             return colourVar;
         }
-/// <summary>
-/// move all variables of the second textfiel to the first textfield 
-/// </summary>
+        
+        /// <summary>
+        /// move all variables of the second textfield to the first textfield 
+        /// </summary>
         void MoveVariablesUp()
         {
             _greenTextFieldList[0].text = _greenTextFieldList[1].text;
@@ -262,53 +279,37 @@ namespace Scenes.Gameboard.Scripts
         }
         
         /// <summary>
-        /// 
+        ///  Sets the current Variable of the given Colour
         /// </summary>
-        /// <param name="colour"></param>
-        /// <param name="colourVar"></param>
+        /// <param name="colour"> 1 = red, 2 = blue, 3 = green, 4 = yellow</param>
+        /// <param name="colourVar"> Variable to set</param>
         public void SetVar(int colour, int colourVar)
         {
             MoveVariablesUp();
             switch (colour)
             {
                 case 1: //red
-                    _aktuelleVarRot= colourVar;
+                    _currentVarRed= colourVar;
                     AddToList();
-                    _redTextFieldList[1].text = _aktuelleVarRot.ToString();
-                    // if (_rotVarList.Count >1)
-// {
-//     _redTextFieldList[0].text = _rotVarList[^2].ToString();
-// }
+                    _redTextFieldList[1].text = _currentVarRed.ToString();
                     SwitchInputFields(false);
                     break;
                 case 2: //blue
-                    _aktuelleVarBlau = colourVar;
+                    _currentVarBlue = colourVar;
                     AddToList();
-                    _blueTextFieldList[1].text = _aktuelleVarBlau.ToString();
-                    //if (_blauVarList.Count >1)
-                    //{
-                   //     _blueTextFieldList[0].text = _blauVarList[^2].ToString();
-                    //}
+                    _blueTextFieldList[1].text = _currentVarBlue.ToString();
                     SwitchInputFields(false);
                     break;
                 case 3: //gruen
-                    _aktuelleVarGruen = colourVar;
+                    _currentVarGreen = colourVar;
                     AddToList();
-                    _greenTextFieldList[1].text = _aktuelleVarGruen.ToString();
-                    /*if (_gruenVarList.Count >1)
-                    {
-                        _greenTextFieldList[0].text = _gruenVarList[^2].ToString();
-                    }*/
+                    _greenTextFieldList[1].text = _currentVarGreen.ToString();
                     SwitchInputFields(false);
                     break;
                 case 4: //gelb
-                    _aktuelleVarGelb = colourVar;
+                    _currentVarYellow = colourVar;
                     AddToList();
-                    _yellowTextFieldList[1].text = _aktuelleVarGelb.ToString();
-                    /*if (_gelbVarList.Count >1)
-                    {
-                        _yellowTextFieldList[0].text = _gelbVarList[^2].ToString();
-                    }*/
+                    _yellowTextFieldList[1].text = _currentVarYellow.ToString();
                     SwitchInputFields(false);
                     break;
             }

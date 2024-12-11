@@ -94,7 +94,7 @@ namespace GabrielBissonnette.SAD
             SetStartVolume();
         }
 
-        #region Levels
+        #region Level
         public void LoadLevel()
         {
             StartCoroutine(WaitToLoadLevel());
@@ -189,7 +189,7 @@ namespace GabrielBissonnette.SAD
 
         #endregion
 
-        #region Options
+        #region Options (Endpostion & Xapi)
 
         public void SetEndPosition(string endPosition)
         {

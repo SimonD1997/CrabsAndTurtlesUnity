@@ -18,6 +18,10 @@ namespace Scenes.Gameboard.Scripts
 
 
         // Update is called once per frame
+        /// <summary>
+        ///  Update Timer and Sound for Timer
+        /// Sound is fading down when Timer is under 29 and fading up when Timer is under 5
+        /// </summary>
         void Update()
         {
             
@@ -51,12 +55,21 @@ namespace Scenes.Gameboard.Scripts
            
         }
 
+        /// <summary>
+        ///  Init Timer with TextMeshProUGUI
+        /// </summary>
+        /// <param name="text"> TextMeshProUGUI</param>
         public void InitTimer(TextMeshProUGUI text)
         {
             this.text = text; 
             audioSource = text.gameObject.GetComponent<AudioSource>();
         }
 
+        
+        /// <summary>
+        ///  Start Timer with Sound or without Sound
+        /// </summary>
+        /// <param name="sound"> true = with Sound, false = without Sound</param>
        public void StartTimer(bool sound)
         {
             if (sound) PlaySound();
@@ -65,6 +78,9 @@ namespace Scenes.Gameboard.Scripts
             
         }
 
+        /// <summary>
+        ///  Stop Timer
+        /// </summary>
         public void StopTimer()
         {
             timerIsRunning = false;
@@ -72,22 +88,36 @@ namespace Scenes.Gameboard.Scripts
             StopSound();
         }
 
+        /// <summary>
+        ///  Set Timer Text
+        /// </summary>
+        /// <param name="timerText"> Text for Timer</param>
         public void SetTimerText(string timerText)
         {
             _timeText = timerText;
         }
 
+        /// <summary>
+        ///  Play Sound for Timer
+        /// </summary>
         private void PlaySound()
         {
             audioSource.volume = 1;
             audioSource.Play();
         }
 
+        /// <summary>
+        ///  Stop Sound for Timer
+        /// </summary>
         private void StopSound()
         {
             audioSource.Stop();
         }
 
+        /// <summary>
+        ///  Fade Sound for Timer with given value
+        /// </summary>
+        /// <param name="volume"> Value for Fade</param>
         private void FadeSound(float volume)
         {
             audioSource.volume += volume;

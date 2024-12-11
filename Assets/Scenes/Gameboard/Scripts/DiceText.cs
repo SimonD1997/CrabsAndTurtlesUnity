@@ -5,6 +5,10 @@ using UnityEngine.UI;
 
 namespace Scenes.Gameboard.Scripts
 {
+    
+    /// <summary>
+    /// Not used in the final version of the game
+    /// </summary>
     public class DiceText : MonoBehaviour
     {
         private TMP_Text diceText;

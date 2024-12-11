@@ -150,7 +150,7 @@ namespace Scenes.Gameboard.Scripts
         {
             _popUpGameobject.SetActive(true);
 
-            _popUp.showImagesforSprites(_popUpSprites);
+            _popUp.ShowImagesforSprites(_popUpSprites);
 
             emitter.Play();
             //effect.LoadEffect();
