@@ -163,7 +163,7 @@ namespace Scenes.Gameboard.Scripts
         void Update()
         {
             
-            if(Keyboard.current.escapeKey.wasPressedThisFrame){ 
+            if(Input.GetKeyDown(KeyCode.Escape)){ 
                 if (mainMenu.activeSelf)
                 {
                     mainMenu.SetActive(false);

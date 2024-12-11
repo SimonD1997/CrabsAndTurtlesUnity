@@ -71,10 +71,12 @@ public class CardFlipClick : MonoBehaviour
     /// </summary>
     void Update()
     {
+        Input.GetMouseButtonDown(1);
         Mouse mouse = Mouse.current;
-        if (mouse.leftButton.wasPressedThisFrame)
+        if (Input.GetMouseButtonDown(1))
         {
-            Vector3 mousePosition = mouse.position.ReadValue();
+            Debug.Log("Mouse Clicked");
+            Vector3 mousePosition = Input.mousePosition;
             Ray ray = m_Camera.ScreenPointToRay(mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
