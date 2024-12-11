@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using DTT.Rankings.Runtime;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
@@ -161,7 +162,8 @@ namespace Scenes.Gameboard.Scripts
         // Update is called once per frame
         void Update()
         {
-            if(Input.GetKeyDown(KeyCode.Escape)){
+            
+            if(Keyboard.current.escapeKey.wasPressedThisFrame){ 
                 if (mainMenu.activeSelf)
                 {
                     mainMenu.SetActive(false);
@@ -801,6 +803,7 @@ namespace Scenes.Gameboard.Scripts
                     {
                         textField.text = "Richtige Antwort!";
                         movementScript.GetAnimator().SetInteger("Face",1);
+                        MovementOfPlayer(1);
                     }else
                     {
                         textField.text = "Falsche Antwort!";
@@ -812,8 +815,7 @@ namespace Scenes.Gameboard.Scripts
                         badges.AddBadges(_badgeList);
                         badges.ShowBadge();
                         badges.ShowPopUp();
-                        MovementOfPlayer(1);
-                        
+
                     }
                     this._lastMovementScript.SetCameraActiv(false);
                     
