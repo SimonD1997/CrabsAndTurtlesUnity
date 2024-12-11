@@ -23,7 +23,7 @@ namespace Scenes.Gameboard.Scripts
         public GameObject blueGameObject;
         public GameObject yellowGameObject;
         public GameObject logTextField;
-        public Animator button;
+        //public Animator button;
 
         private TMP_InputField _greenTextField;
         private TMP_InputField _redTextField;
@@ -113,12 +113,12 @@ namespace Scenes.Gameboard.Scripts
         {
             if (active)
             {
-                button.SetBool("Active",true);
+                //button.SetBool("Active",true);
                 this.gameObject.SetActive(true);
             }
             else
             {
-                button.SetBool("Active",false);
+                //button.SetBool("Active",false);
                 this.gameObject.SetActive(false);
             }
         }
@@ -130,12 +130,12 @@ namespace Scenes.Gameboard.Scripts
         {
             if (this.gameObject.activeSelf)
             {
-                button.SetBool("Active",false);
+                //button.SetBool("Active",false);
                 this.gameObject.SetActive(false);
             }
             else
             {
-                button.SetBool("Active",true);
+                //button.SetBool("Active",true);
                 this.gameObject.SetActive(true);
             }
         }

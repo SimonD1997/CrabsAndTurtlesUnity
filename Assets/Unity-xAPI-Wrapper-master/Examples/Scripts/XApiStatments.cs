@@ -38,11 +38,17 @@ namespace Unity_xAPI_Wrapper_master.Examples.Scripts
             
         }
         
+        /// <summary>
+        /// Send a simple xAPI statement when the button is clicked
+        /// </summary>
         public void ButtonClicked()
         {
             SendSimpleStatement(Verbs.Interacted);
         }
         
+        /// <summary>
+        ///  Send a simple xAPI statement when the Application is closed
+        /// </summary>
         void OnApplicationQuit() {
             SendSimpleStatement(Verbs.Terminated);
         }
