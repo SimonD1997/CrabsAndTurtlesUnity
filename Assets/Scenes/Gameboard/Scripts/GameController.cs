@@ -800,6 +800,7 @@ namespace Scenes.Gameboard.Scripts
                     if (_newColourNumber == variableField.GetVar(movementScript.GetPositionColour()))
                     {
                         textField.text = "Richtige Antwort!";
+                        MovementOfPlayer(1);
                         movementScript.GetAnimator().SetInteger("Face",1);
                     }else
                     {
@@ -812,7 +813,7 @@ namespace Scenes.Gameboard.Scripts
                         badges.AddBadges(_badgeList);
                         badges.ShowBadge();
                         badges.ShowPopUp();
-                        MovementOfPlayer(1);
+                        
                         
                     }
                     this._lastMovementScript.SetCameraActiv(false);
